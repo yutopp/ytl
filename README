@@ -4,6 +4,9 @@
 てきとうなライブラリの実験場です。
 
 
+このライブラリは一部でBoostを使用しているので、パスを通しておいてください。
+また、msvc_projectではDドライブにytlとboostがあると仮定して、パスを通す設定をしてあります。
+
 +++ Contents +++
 - msvc_project
 	Contain MSVC10 project files.
@@ -13,10 +16,13 @@
   	This library can generate machine code.
 	(It's under construction... Please give me advice!)
 
+- sample
+	Contain samples.
+
 
 +++ The future plans +++
 - Expansion of the assembler library
-- Add Samples
+- Expansion of Samples
 - Add the GC library
 
 

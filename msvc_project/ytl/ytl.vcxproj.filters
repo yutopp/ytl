@@ -1,59 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ヘッダー ファイル">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="lib">
+      <UniqueIdentifier>{86265079-b45f-40b2-8289-13040d4d67a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\assembler">
+    <Filter Include="lib\assembler">
       <UniqueIdentifier>{c22201e9-8b92-4876-86e5-7193934c7855}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\assembler\detail">
+    <Filter Include="lib\assembler\detail">
       <UniqueIdentifier>{6c3ccc41-216e-49d0-87fc-f471d5774cb0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\assembler\arch">
+    <Filter Include="lib\assembler\arch">
       <UniqueIdentifier>{8b0d167f-29dd-4a02-8db2-0e57b174a120}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ヘッダー ファイル\assembler\arch\ia_32">
+    <Filter Include="lib\assembler\arch\ia_32">
       <UniqueIdentifier>{ee077899-0027-4527-ae44-dbbe1caa0e42}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
-      <Filter>ヘッダー ファイル\assembler</Filter>
+      <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\code_stub.hpp">
-      <Filter>ヘッダー ファイル\assembler</Filter>
+      <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\config.hpp">
-      <Filter>ヘッダー ファイル\assembler</Filter>
+      <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\writer.hpp">
-      <Filter>ヘッダー ファイル\assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler.hpp">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp">
-      <Filter>ヘッダー ファイル\assembler\detail</Filter>
+      <Filter>lib\assembler\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch</Filter>
+      <Filter>lib\assembler\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\address.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch\ia_32</Filter>
+      <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\aliginment.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch\ia_32</Filter>
+      <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\data_types.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch\ia_32</Filter>
+      <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\generator.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch\ia_32</Filter>
+      <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\registers.hpp">
-      <Filter>ヘッダー ファイル\assembler\arch\ia_32</Filter>
+      <Filter>lib\assembler\arch\ia_32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler.hpp">
+      <Filter>lib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

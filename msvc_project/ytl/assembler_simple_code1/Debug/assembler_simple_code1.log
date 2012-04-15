@@ -1,0 +1,17 @@
+﻿2012/04/15 23:19:48 にビルドを開始しました。
+     1>ノード 2 上のプロジェクト "C:\Users\yutopp\library\ytl\msvc_project\ytl\assembler_simple_code1\assembler_simple_code1.vcxproj" (build ターゲット)。
+     1>InitializeBuildStatus:
+         "AlwaysCreate" が指定されたため "Debug\assembler_simple_code1.unsuccessfulbuild" を作成しています。
+       ClCompile:
+         すべての出力が最新のものです。
+       Link:
+         すべての出力が最新のものです。
+         assembler_simple_code1.vcxproj -> C:\Users\yutopp\library\ytl\msvc_project\ytl\Debug\assembler_simple_code1.exe
+       FinalizeBuildStatus:
+         ファイル "Debug\assembler_simple_code1.unsuccessfulbuild" を削除しています。
+         "Debug\assembler_simple_code1.lastbuildstate" のタッチ タスクを実行しています。
+     1>プロジェクト "C:\Users\yutopp\library\ytl\msvc_project\ytl\assembler_simple_code1\assembler_simple_code1.vcxproj" (build ターゲット) のビルドが完了しました。
+
+ビルドに成功しました。
+
+経過時間 00:00:00.04
