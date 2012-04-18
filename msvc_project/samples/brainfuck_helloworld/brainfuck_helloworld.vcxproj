@@ -10,9 +10,12 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\samples\brainfuck\helloworld\main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{25902D79-D968-416B-8BEF-CCFC76F8E9B0}</ProjectGuid>
-    <RootNamespace>ytl</RootNamespace>
+    <ProjectGuid>{891D7E86-133C-44B9-9B4E-469367BFBA4E}</ProjectGuid>
+    <RootNamespace>brainfuck_helloworld</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -36,7 +39,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>D:\boost_1_49_0;D:\ytl;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>D:\boost_1_49_0;D:\ytl;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -59,22 +67,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ytl\assembler.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\address.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\aliginment.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\data_types.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\generator.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\registers.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\code_stub.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\config.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\writer.hpp" />
-    <ClInclude Include="..\..\ytl\brainfuck.hpp" />
-    <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

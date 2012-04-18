@@ -24,7 +24,7 @@ int main() {
 	gen.add( ecx, 4 );
 
 	gen.add( al, 4 );	//
-//	gen.add( ax, 4 );	//
+//	gen.add( ax, 4 );
 	gen.add( eax, 4 );	//
 	gen.mov( ptr[ebx], edx );
 	gen.add( ptr[ebx], -5 );

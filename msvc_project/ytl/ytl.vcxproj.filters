@@ -16,6 +16,9 @@
     <Filter Include="lib\assembler\arch\ia_32">
       <UniqueIdentifier>{ee077899-0027-4527-ae44-dbbe1caa0e42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\brainfuck">
+      <UniqueIdentifier>{0e2e9c5e-7569-4fe0-9ff3-6b10a94d6203}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
@@ -53,6 +56,12 @@
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler.hpp">
       <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\brainfuck.hpp">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp">
+      <Filter>lib\brainfuck</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

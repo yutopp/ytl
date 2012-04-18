@@ -82,14 +82,14 @@
 	void name( r_m16 dst, byte_value src )							\
 	{																\
 		db( oprm16_32imm8 );										\
-		dmod_rm_sib_disp( dst, 0 );									\
+		dmod_rm_sib_disp( dst, op_code );							\
 		db( src );													\
 	}																\
 	/* name r/m32, imm8 */											\
 	void name( r_m32 dst, byte_value src )							\
 	{																\
 		db( oprm16_32imm8 );										\
-		dmod_rm_sib_disp( dst, 0 );									\
+		dmod_rm_sib_disp( dst, op_code );							\
 		db( src );													\
 	}																\
 	/* name r/m8, r8 */												\
@@ -145,16 +145,11 @@ namespace ytd
 				typedef Writter		writter_type;
 
 			public:
-				/*
-				*/
 				generator( buffer_type& buffer )
 					: index_( 0u )
 					, buffer_( buffer )
 				{}
 
-
-				/*
-				*/
 				buffer_type const& get_buffer() const
 				{
 					return buffer_;
@@ -170,49 +165,64 @@ namespace ytd
 				// -- A --
 
 				// AAA
-				void aaa()
-				{
-					db( 0x37 );
-				}
+				void aaa() { db( 0x37 ); }
 
 
 				// AAD
-				void aad()
-				{
-					db( 0xd5 );
-					db( 0x0a );
-				}
+				void aad() { db( 0xd5 ); db( 0x0a ); }
 				/*// AAD ib
-				void aad( byte_value dst )
-				{
-					db( 0xd5 );
-					db( dst );
-				}*/
+				void aad( byte_value dst ) { db( 0xd5 ); db( dst ); }*/
 
 
 				// AAM
-				void aam()
-				{
-					db( 0xd4 );
-					db( 0x0a );
-				}
+				void aam() { db( 0xd4 ); db( 0x0a ); }
 				/*// AAM ib
-				void aam( byte_value dst )
-				{
-					db( 0xD4 );
-					db( dst );
-				}*/
+				void aam( byte_value dst ) { db( 0xD4 ); db( dst ); }*/
 
 
 				// AAS
-				void aas()
-				{
-					db( 0x3f );
-				}
+				void aas() { db( 0x3f ); }
+
+
+				// ADC
+				TYPICAL_OPERATOR( adc, 0x14, 0x15, 2, 0x80, 0x81, 0x83, 0x10, 0x11, 0x12, 0x13 );
 
 
 				// ADD
 				TYPICAL_OPERATOR( add, 0x04, 0x05, 0, 0x80, 0x81, 0x83, 0x00, 0x01, 0x02, 0x03 );
+
+
+				// ADDPD
+
+				// ADDPS
+
+				// ADDSD
+
+				// ADDSS
+
+				// ADDSUBPD
+
+				// ADDSUBPS
+
+
+				// AND
+				TYPICAL_OPERATOR( and, 0x24, 0x25, 4, 0x80, 0x81, 0x83, 0x20, 0x21, 0x22, 0x23 );
+
+
+				// ANDPD
+
+				// ANDPS
+
+				// ANDNPD
+
+				// ANDNPS
+
+
+				// ARPL
+				void arpl( r_m16 dst, registers::detail::id<16> src ) {
+					db( 0x63 );
+					dmod_rm_sib_disp( dst, src );
+				}
 
 				// -- B --
 				// -- C --
@@ -321,73 +331,8 @@ namespace ytd
 				// -- S --
 
 				// SUB
-				void sub( registers::detail::id<8> dst, dword_value src )
-				{
-					if ( dst == registers::al ) {
-						db( 0x2c );
-						db( byte_value( src ) );
+				TYPICAL_OPERATOR( sub, 0x2c, 0x2d, 5, 0x80, 0x81, 0x83, 0x28, 0x29, 0x2a, 0x2b );
 
-					} else {
-						sub( r_m8( mod_rm( dst ) ), byte_value( src ) );
-					}
-				}
-
-				void sub( registers::detail::id<16> dst, dword_value src )
-				{
-					if ( dst == registers::ax ) {
-						db( 0x2d );
-						dw( word_value( src ) );
-
-					} else {
-						sub( r_m16( mod_rm( dst ) ), word_value( src ) );
-					}
-				}
-
-				void sub( registers::detail::id<32> dst, dword_value src )
-				{
-					if ( dst == registers::eax ) {
-						db( 0x2d );
-						dd( src );
-
-					} else {
-						sub( r_m32( mod_rm( dst ) ), src );
-					}
-				}
-
-				void sub( r_m8 dst, byte_value src )
-				{
-					db( 0x80 );
-					dmod_rm_sib_disp( dst, 5 );
-					db( src );
-				}
-
-				void sub( r_m16 dst, word_value src )
-				{
-					db( 0x81 );
-					dmod_rm_sib_disp( dst, 5 );
-					dw( src );
-				}
-
-				void sub( r_m32 dst, dword_value src )
-				{
-					db( 0x81 );
-					dmod_rm_sib_disp( dst, 5 );
-					dd( src );
-				}
-
-				void sub( registers::detail::id<16> dst, byte_value src )
-				{
-					db( 0x83 );
-					db( make_mod_rm( 5, dst ) );
-					db( src );
-				}
-
-				void sub( registers::detail::id<32> dst, byte_value src )
-				{
-					db( 0x83 );
-					db( make_mod_rm( 0/*unused*/, 5, dst ) );
-					db( src );
-				}
 
 				// -- T --
 				// -- U --
