@@ -110,6 +110,7 @@ namespace ytd
 		class interpreter
 		{
 			typedef DictT dictinary_type;
+			typedef std::basic_string<typename std::iterator_traits<IterT>::value_type> string_type;
 			typedef ElemT value_type;
 			typedef typename std::vector<value_type> container;
 			typedef typename container::iterator iterator;
@@ -150,8 +151,6 @@ namespace ytd
 				while( it != end ) {
 					const auto order = get_token( it, end );
 					const auto& type = order.first;
-					if ( type == order::finish )
-						break;
 
 					if ( type == order::increment_pointer ) {
 						++ptr_;
@@ -199,16 +198,19 @@ namespace ytd
 						--(*ptr_);
 
 					} else if ( type == order::input ) {
-						std::cout << *ptr_ ;
+						std::cin >> *ptr_;
 
 					} else if ( type == order::output ) {
-						std::cin >> *ptr_;
+						std::cout << *ptr_;
 
 					}/* else {
 						// nop
 					}*/
 
 					std::advance( it, order.second );
+
+					if ( type == order::finish )
+						break;
 				}
 
 				return true;
@@ -217,8 +219,7 @@ namespace ytd
 			std::pair<typename order::type, std::size_t> get_token( IterT const& begin, IterT const& end ) const
 			{
 				typedef dictionary_traits<dictinary_type> dic_type;
-
-				std::basic_string<typename std::iterator_traits<IterT>::value_type> order;
+				string_type order;
 				std::size_t retry = 0;
 				for( IterT it=begin; it!=end; ++it, ++retry ) {
 					if ( retry >= dic_type::max_length )
@@ -245,14 +246,14 @@ namespace ytd
 						return std::make_pair( order::decrement_value, order.size() );
 
 					} else if ( order == dic_type::output() ) {
-						return std::make_pair( order::input, order.size() );
+						return std::make_pair( order::output, order.size() );
 
 					} else if ( order == dic_type::input() ) {
-						return std::make_pair( order::output, order.size() );
+						return std::make_pair( order::input, order.size() );
 					}
 				}
 
-				return std::make_pair( order::finish, 0 );
+				return std::make_pair( order::finish, order.size() );
 			}
 
 			container memory_;
