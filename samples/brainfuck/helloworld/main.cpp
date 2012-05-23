@@ -109,7 +109,7 @@ int main() {
 			L"(^q^)-！ﾋﾟｬｧｧｧｧｧｧｧｧ(^q^)<ｧｧｧｧﾋﾟｬ-！<ｧｳﾝﾊﾞﾎﾞ" \
 			L"(^q^)-！ｧｧｧｧｧｧｧｧｧｧｳﾝﾊﾞﾎﾞ";
 
-		const bool b = ytd::brainfuck::parse<pyaa_dict>( s.cbegin(), s.cend() );
+		const bool b = ytl::brainfuck::parse<pyaa_dict>( s.cbegin(), s.cend() );
 		if ( !b )
 			std::cout << " : error..." << std::endl;
 	}*/
@@ -195,7 +195,7 @@ int main() {
 			L"(」・ω・)」うー!(／・ω・)／にゃー!(」・ω・)」うー!(／・ω・)／にゃー!" \
 			L"(」・ω・)」うー!(／・ω・)／にゃー!(」・ω・)」うー!(／・ω・)／にゃー!Let's＼(・ω・)／にゃー﻿";
 
-		const bool b = ytd::brainfuck::parse<nyaruko_dict>( s.cbegin(), s.cend() );
+		const bool b = ytl::brainfuck::parse<nyaruko_dict>( s.cbegin(), s.cend() );
 		if ( !b )
 			std::cout << " : error..." << std::endl;
 	}

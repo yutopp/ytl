@@ -3,5 +3,4 @@
 
 #include "brainfuck/interpreter.hpp"
 
-
 #endif /*YTL_BRAINFUCK_HPP*/

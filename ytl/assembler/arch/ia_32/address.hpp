@@ -1,14 +1,14 @@
 #ifndef YTL_ASSEMBLER_IA32_ADDRESS_HPP
 #define YTL_ASSEMBLER_IA32_ADDRESS_HPP
 
+#include <boost/variant.hpp>
+
 #include "../../config.hpp"
 
 #include "data_types.hpp"
 #include "registers.hpp"
 
-#include <boost/variant.hpp>
-
-namespace ytd
+namespace ytl
 {
 	namespace assembler
 	{
@@ -23,19 +23,21 @@ namespace ytd
 				typedef ValueT	value_type;
 
 				explicit disp_value( value_type disp )
-					: reg_( registers::detail::id<32>( 4 ) /* 0b100 : [--][--] SIB */ )
+					: reg_( registers::r32_t( 4 ) /* 0b100 : [--][--] SIB */ )
 					, value_( disp ) {}
 
-				disp_value( registers::detail::id<32> reg, value_type disp )
+				disp_value( registers::r32_t reg, value_type disp )
 					: reg_( reg )
 					, value_( disp ) {}
 
-				registers::detail::id<32> reg_;		// memorize target register
+				registers::r32_t reg_;		// memorize target register
 				value_type value_;
 			};
 
 			typedef disp_value<byte_value>	disp8_value;	// 8bit displacement
+			typedef disp_value<word_value>	disp16_value;	// 16bit displacement
 			typedef disp_value<dword_value>	disp32_value;	// 32bit displacement
+
 
 			/*
 			*/
@@ -43,16 +45,18 @@ namespace ytd
 			{
 				sib_value(
 					byte_t ss,
-					registers::detail::id<32> index,
-					registers::detail::id<32> base = registers::detail::id<32>( 4 ) /* 0b100 : none */
+					registers::r32_t index,
+					registers::r32_t base = registers::r32_t( 4 ) /* 0b100 : none */
 					)
 					: ss_( ss )
 					, index_( index )
-					, base_( base ) {}
+					, base_( base )
+				{}
 
 				byte_t ss_;
-				registers::detail::id<32> index_, base_;
+				registers::r32_t index_, base_;
 			};
+
 
 			/*
 			*/
@@ -61,7 +65,7 @@ namespace ytd
 			{
 				typedef ValueT	value_type;
 
-				explicit sib_disp_value( sib_value const& sib, value_type disp )
+				sib_disp_value( sib_value const& sib, value_type disp )
 					: sib_( sib )
 					, disp_( disp ) {}
 
@@ -75,28 +79,29 @@ namespace ytd
 			namespace registers
 			{
 				/*
-					disp scales : REG +- disp
+					disp scales : REG32 +- disp[8/32]
 				*/
-				disp8_value operator+( registers::detail::id<32> const& reg, byte_value disp )
+				disp8_value operator+( registers::r32_t const& reg, byte_value disp )
 				{
 					return disp8_value( reg, disp );
 				}
-				disp8_value operator-( registers::detail::id<32> const& reg, byte_value disp )
+				disp8_value operator-( registers::r32_t const& reg, byte_value disp )
 				{
 					return disp8_value( reg, byte_value( ~disp.value_ + 1 ) );
 				}
 			
-				disp32_value operator+( registers::detail::id<32> const& reg, int disp )
+				disp32_value operator+( registers::r32_t const& reg, int32_t disp )
 				{
 					return disp32_value( reg, disp );
 				}
-				disp32_value operator-( registers::detail::id<32> const& reg, int disp )
+				disp32_value operator-( registers::r32_t const& reg, int32_t disp )
 				{
-					return disp32_value( reg, ~disp + 1 ); // buggy?
+					return disp32_value( reg, ~disp + 1 );
 				}
 
+
 				/*
-					sib disp scales : BASE + REG * n +- disp
+					sib & disp scales(Mod R/M[R/M 0b100]) : [--][--] +- disp[8/32]
 				*/
 				sib_disp8_value operator+( sib_value const& sib, byte_value disp )
 				{
@@ -107,33 +112,46 @@ namespace ytd
 					return sib_disp8_value( sib, byte_value( ~disp.value_ + 1 ) );
 				}
 			
-				sib_disp32_value operator+( sib_value const& sib, int disp )
+				sib_disp32_value operator+( sib_value const& sib, int32_t disp )
 				{
 					return sib_disp32_value( sib, disp );
 				}
-				sib_disp32_value operator-( sib_value const& sib, int disp )
+				sib_disp32_value operator-( sib_value const& sib, int32_t disp )
 				{
-					return sib_disp32_value( sib, ~disp + 1 ); // buggy?
+					return sib_disp32_value( sib, ~disp + 1 );
 				}
 
+
+				/* ----------------
+				--	sib bites appear only in 32bit addresing format.
+				-----------------*/
 				/*
-					SIB scales
+					SIB scales(No Base) : REG32 * n
 				*/
-				sib_value operator*( registers::detail::id<32> const& reg, int scale )	// REG * n
+				sib_value operator*( registers::r32_t const& reg, int32_t scale )	
 				{
+					assert( reg != registers::esp );
 					assert( scale == 0 || scale == 1 || scale == 2 || scale == 4 );
 
 					return sib_value( scale==0 ? 0 : scale==1 ? 1 : scale==2 ? 2 : scale==4 ? 3 : throw/*unreachable*/, reg );
 				}
-
-				sib_value operator+( registers::detail::id<32> const& base, sib_value const& sib )	// BASE + REG * n
+				sib_value operator*( int32_t scale, registers::r32_t const& reg )	
+				{
+					return reg * scale;
+				}
+				/*
+					SIB scales : BASE_REG32 + ( REG32 * n )[SIB scales(No Base)]
+				*/
+				sib_value operator+( registers::r32_t const& base, sib_value const& sib )	
 				{
 					return sib_value( sib.ss_, sib.index_, base );
 				}
 			} // namespace registers
 
+
 			/*
 			*/
+			template<unsigned int N>
 			struct mod_rm
 			{
 				mod_rm( byte_t mod, byte_t rm )
@@ -141,28 +159,29 @@ namespace ytd
 					, rm_( rm )
 				{}
 
-				template<unsigned int N>
 				mod_rm( registers::detail::id<N> reg ) // implicit
 					: mod_( 3/*0b11*/ )
-					, rm_( reg )
+					, rm_( reg.get() )
 				{}
 
 				byte_t mod_, rm_;	//reg or opcode field id determined later.
 			};
+			typedef mod_rm<8>	mod_rm8;	// 
+			typedef mod_rm<16>	mod_rm16;	// 
+			typedef mod_rm<32>	mod_rm32;	// 
 
 
-			template<typename DispT>
+			template<unsigned int N, typename DispT>
 			struct mod_rm_disp
-				: public mod_rm
+				: public mod_rm<N>
 			{
 				typedef typename DispT::value_type value_type;
 
 				mod_rm_disp( byte_t mod, DispT const& disp )
-					: mod_rm( mod, disp.reg_ )
+					: mod_rm( mod, disp.reg_.get() )
 					, disp_( disp.value_ )
 				{}
-
-				
+	
 				mod_rm_disp( byte_t mod, byte_t rm, value_type disp_value )
 					: mod_rm( mod, rm )
 					, disp_( disp_value )
@@ -170,14 +189,20 @@ namespace ytd
 
 				value_type disp_;
 			};
-			typedef mod_rm_disp<disp8_value>	mod_rm_disp8;
-			typedef mod_rm_disp<disp32_value>	mod_rm_disp32;
+			typedef mod_rm_disp<8, disp8_value>		mod_rm_disp8;
+			typedef mod_rm_disp<16, disp16_value>	mod_rm_disp16;
+
+			typedef mod_rm_disp<32, disp8_value>	mod_rm32_disp8;
+			typedef mod_rm_disp<32, disp32_value>	mod_rm32_disp32;
 
 
-			struct mod_rm_sib
-				: public mod_rm
+			/* ----------------
+			--	sib bites appear only in 32bit addresing format.
+			-----------------*/
+			struct mod_rm32_sib
+				: public mod_rm<32>
 			{
-				mod_rm_sib( byte_t mod, byte_t rm, sib_value const& sib )
+				mod_rm32_sib( byte_t mod, byte_t rm, sib_value const& sib )
 					: mod_rm( mod, rm )
 					, sib_( sib )
 				{}
@@ -185,52 +210,80 @@ namespace ytd
 				sib_value sib_;
 			};
 
-
 			template<typename DispT>
-			struct mod_rm_sib_disp
-				: public mod_rm
+			struct mod_rm32_sib_disp
+				: public mod_rm<32>
 			{
 				typedef sib_disp_value<typename DispT::value_type> value_type;
 			
-				mod_rm_sib_disp( byte_t mod, byte_t rm, value_type const& disp_value )
+				mod_rm32_sib_disp( byte_t mod, byte_t rm, value_type const& disp_value )
 					: mod_rm( mod, rm )
 					, sib_disp_( disp_value )
 				{}
 
 				value_type sib_disp_;
 			};
-			typedef mod_rm_sib_disp<disp8_value>	mod_rm_sib_disp8;
-			typedef mod_rm_sib_disp<disp32_value>	mod_rm_sib_disp32;
+			typedef mod_rm32_sib_disp<disp8_value>	mod_rm32_sib_disp8;
+			typedef mod_rm32_sib_disp<disp32_value>	mod_rm32_sib_disp32;
 
+			/* ----------------
+			--	Mod R/M
+			-----------------*/
+/*			typedef boost::variant<
+				mod_rm32,			// only mod_rm field
+				mod_rm32_disp8,		// mod_rm & disp(1Byte) field
+				mod_rm32_disp32,	// mod_rm & disp(4Byte) field
+				mod_rm_sib,			// mod_rm & sib(1Byte) field
+				mod_rm_sib_disp8,	// mod_rm & sib(1Byte) field & disp(1Byte) field
+				mod_rm_sib_disp32	// mod_rm & sib(1Byte) field & disp(4Byte) field
+			> addressing;*/
 
 			typedef boost::variant<
-				mod_rm,			// only mod_rm field
-				mod_rm_disp8,	// mod_rm & disp(1Byte) field
-				mod_rm_disp32,	// mod_rm & disp(4Byte) field
-				mod_rm_sib,
-				mod_rm_sib_disp8,
-				mod_rm_sib_disp32
-			> addressing;
+				mod_rm8//,			// only mod_rm field
+//				mod_rm32_disp8,		// mod_rm & disp(1Byte) field
+//				mod_rm32_disp32,	// mod_rm & disp(4Byte) field
+			> r_m8_addressing;
 
+			typedef boost::variant<
+				mod_rm16//,			// only mod_rm field
+//				mod_rm32_disp8,		// mod_rm & disp(1Byte) field
+//				mod_rm32_disp32,	// mod_rm & disp(4Byte) field
+			> r_m16_addressing;
+
+			typedef boost::variant<
+				mod_rm32,			// only mod_rm field
+				mod_rm32_disp8,		// mod_rm & disp(1Byte) field
+				mod_rm32_disp32,	// mod_rm & disp(4Byte) field
+				mod_rm32_sib,		// mod_rm & sib(1Byte) field
+				mod_rm32_sib_disp8,	// mod_rm & sib(1Byte) field & disp(1Byte) field
+				mod_rm32_sib_disp32	// mod_rm & sib(1Byte) field & disp(4Byte) field
+			> r_m32_addressing;
 
 			/*
 			*/
-			typedef detail::value_wrapper<addressing, byte_t>	r_m8;
-			typedef detail::value_wrapper<addressing, word_t>	r_m16;
-			typedef detail::value_wrapper<addressing, dword_t>	r_m32;
+			typedef detail::value_wrapper<r_m8_addressing>		r_m8;
+			typedef detail::value_wrapper<r_m16_addressing>		r_m16;
+			typedef detail::value_wrapper<r_m32_addressing>		r_m32;
 
-			struct r_m32_implicit
-				: public detail::value_wrapper<addressing, dword_t>
+			template<unsigned int N, typename T>
+			struct implicit_r_m
+				: public detail::value_wrapper<T>
 			{
-				r_m32_implicit( r_m32 value )		// implicit
-					: value_wrapper( value ) {}
+				implicit_r_m( T value )	// implicit
+					: value_wrapper( value )
+				{}
 
-				r_m32_implicit( addressing value )	// implicit
-					: value_wrapper( value ) {}
+				implicit_r_m( detail::value_wrapper<T> value )
+					: value_wrapper( value )
+				{}
 
-				r_m32_implicit( registers::detail::id<32> reg ) // implicit
-					: value_wrapper( mod_rm( reg ) ) {}
+				implicit_r_m( registers::detail::id<N> reg )
+					: value_wrapper( mod_rm<N>( reg ) )
+				{}
 			};
+			typedef implicit_r_m<8, r_m8_addressing>	r_m8_implicit;
+			typedef implicit_r_m<16, r_m16_addressing>	r_m16_implicit;
+			typedef implicit_r_m<32, r_m32_addressing>	r_m32_implicit;
 
 
 			namespace detail
@@ -242,22 +295,23 @@ namespace ytd
 
 				inline byte_t make_mod_rm( byte_t const op_code, byte_t const rm )
 				{
-					return make_mod_rm( 3, op_code, rm );
+					return make_mod_rm( 3/*0b11*/, op_code, rm );
 				}
 
-				inline byte_t make_mod_rm( mod_rm const& mod_rm_value, registers::detail::id<32> const& reg )
+				template<unsigned int N>
+				inline byte_t make_mod_rm( mod_rm<N> const& mod_rm_value, registers::detail::id<N> const& reg )
 				{
 					return make_mod_rm( mod_rm_value.mod_, reg, mod_rm_value.rm_ );
 				}
 
-				inline byte_t make_sib( byte_t const ss, registers::detail::id<32> const index, registers::detail::id<32> const& base )
+				inline byte_t make_sib( byte_t const ss, registers::r32_t const index, registers::r32_t const& base )
 				{
-					return ( ss << 6 & 0xc0 ) | ( index << 3 & 0x38 ) | ( base & 0x07 );
+					return ( ss << 6 & 0xc0 ) | ( index.get() << 3 & 0x38 ) | ( base.get() & 0x07 );
 				}
 			} // namespace detail
 
 		} // namespace ia_32
 	} // namespace assembler
-} // namespace ytd
+} // namespace ytl
 
 #endif /*YTL_ASSEMBLER_IA32_ADDRESS_HPP*/

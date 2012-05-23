@@ -3,7 +3,7 @@
 
 #include "../../config.hpp"
 
-namespace ytd
+namespace ytl
 {
 	namespace assembler
 	{
@@ -22,7 +22,25 @@ namespace ytd
 						explicit id( byte_t v )
 							: v_( v ) {}
 
-						operator byte_t() const { return v_; }
+						bool operator==( id const& rhs ) const
+						{
+							return v_ == rhs.v_;
+						}
+
+						bool operator!=( id const& rhs ) const
+						{
+							return !( *this == rhs );
+						}
+
+						friend byte_t operator+( int lhs, id const& rhs )
+						{
+							return lhs + rhs.v_;
+						}
+
+						byte_t get() const
+						{
+							return v_;
+						}
 
 					private:
 						byte_t v_;
@@ -31,7 +49,8 @@ namespace ytd
 
 
 				// 8bit register
-				static const detail::id<8>
+				typedef detail::id<8> r8_t;
+				static const r8_t
 					al( 0 ),
 					cl( 1 ),
 					dl( 2 ),
@@ -43,7 +62,8 @@ namespace ytd
 
 
 				// 16bit register
-				static const detail::id<16>
+				typedef detail::id<16> r16_t;
+				static const r16_t
 					ax( 0 ),
 					cx( 1 ),
 					dx( 2 ),
@@ -54,8 +74,29 @@ namespace ytd
 					di( 7 );
 
 
+				// 16bit segment register
+				typedef detail::id<1600> es_t;
+				static const es_t es( 0 );
+
+				typedef detail::id<1601> cs_t;
+				static const cs_t cs( 1 );
+
+				typedef detail::id<1602> ss_t;
+				static const ss_t ss( 2 );
+
+				typedef detail::id<1603> ds_t;
+				static const ds_t ds( 3 );
+
+				typedef detail::id<1604> fs_t;
+				static const fs_t fs( 4 );
+
+				typedef detail::id<1605> gs_t;
+				static const gs_t gs( 5 );
+
+
 				// 32bit register
-				static const detail::id<32>
+				typedef detail::id<32> r32_t;
+				static const r32_t
 					eax( 0 ),
 					ecx( 1 ),
 					edx( 2 ),
@@ -68,6 +109,6 @@ namespace ytd
 			} // namespace registers
 		} // namespece ia_32
 	} // namespace assembler
-} // namespace ytd
+} // namespace ytl
 
 #endif /*YTL_ASSEMBLER_IA32_REGISTERS_HPP*/

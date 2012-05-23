@@ -66,14 +66,29 @@
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\address.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\aliginment.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\data_types.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\generator.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\engine.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\mov_family.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\push_family.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\registers.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\pseudo_operations.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp" />
     <ClInclude Include="..\..\ytl\assembler\code_stub.hpp" />
     <ClInclude Include="..\..\ytl\assembler\config.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\detail\windows_code_stub.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\exception.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\generator.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\endian_writer.hpp" />
     <ClInclude Include="..\..\ytl\assembler\writer.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp" />
+    <ClInclude Include="..\..\ytl\config\platform.hpp" />
+    <ClInclude Include="..\..\ytl\config\typedef.hpp" />
+    <ClInclude Include="..\..\ytl\config\windows.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ytl\assembler\arch\ia_32\parts\pop_family.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

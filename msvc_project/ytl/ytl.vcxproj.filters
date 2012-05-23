@@ -19,6 +19,12 @@
     <Filter Include="lib\brainfuck">
       <UniqueIdentifier>{0e2e9c5e-7569-4fe0-9ff3-6b10a94d6203}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\config">
+      <UniqueIdentifier>{a627c097-6055-4147-8bfd-700fd0c7003d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\assembler\arch\ia_32\parts">
+      <UniqueIdentifier>{5768919e-3661-42e4-b193-e8dcfb18ae29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
@@ -28,9 +34,6 @@
       <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\config.hpp">
-      <Filter>lib\assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\writer.hpp">
       <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp">
@@ -48,9 +51,6 @@
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\data_types.hpp">
       <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\generator.hpp">
-      <Filter>lib\assembler\arch\ia_32</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\ia_32\registers.hpp">
       <Filter>lib\assembler\arch\ia_32</Filter>
     </ClInclude>
@@ -63,5 +63,52 @@
     <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp">
       <Filter>lib\brainfuck</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ytl\config\typedef.hpp">
+      <Filter>lib\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\config\windows.hpp">
+      <Filter>lib\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\config\platform.hpp">
+      <Filter>lib\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\detail\windows_code_stub.hpp">
+      <Filter>lib\assembler\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\exception.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\push_family.hpp">
+      <Filter>lib\assembler\arch\ia_32\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\mov_family.hpp">
+      <Filter>lib\assembler\arch\ia_32\parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\engine.hpp">
+      <Filter>lib\assembler\arch\ia_32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\generator.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\writer.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp">
+      <Filter>lib\assembler\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\endian_writer.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\arch\pseudo_operations.hpp">
+      <Filter>lib\assembler\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp">
+      <Filter>lib\assembler\arch</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ytl\assembler\arch\ia_32\parts\pop_family.hpp">
+      <Filter>lib\assembler\arch\ia_32\parts</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

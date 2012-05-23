@@ -3,7 +3,7 @@
 
 #include "../../config.hpp"
 
-namespace ytd
+namespace ytl
 {
 	namespace assembler
 	{
@@ -11,12 +11,12 @@ namespace ytd
 		{
 			namespace detail
 			{
-				template<typename T, typename U = void>
+				template<typename T>
 				struct value_wrapper
 				{
 					typedef T value_type;
 
-					explicit value_wrapper( value_type value )
+					explicit value_wrapper( value_type const& value )
 						: value_( value ) {}
 
 					operator value_type() const { return value_; }
@@ -29,10 +29,10 @@ namespace ytd
 			/*
 				8bit/16bit/32bit value wrappers
 			*/
-			typedef detail::value_wrapper<byte_t> byte_value;
-			typedef detail::value_wrapper<word_t> word_value;
+			typedef detail::value_wrapper<int8_t> byte_value;
+			typedef detail::value_wrapper<int16_t> word_value;
 			struct dword_value
-				: public detail::value_wrapper<dword_t>
+				: public detail::value_wrapper<int32_t>
 			{
 				dword_value( dword_t value )	// implicit
 					: value_wrapper( value ) {}
@@ -45,6 +45,6 @@ namespace ytd
 
 		} // namespace ia_32
 	} // namespace assembler
-} // namespace ytd
+} // namespace ytl
 
 #endif /*YTL_ASSEMBLER_IA32_DATA_TYPE_HPP*/

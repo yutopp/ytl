@@ -1,5 +1,7 @@
-
-/msvc_project/samples/assembler_calc72/Debug
-/msvc_project/ytl/ipch
-/msvc_project/ytl/Debug
-/msvc_project/samples/brainfuck_helloworld/Debug
+/*/*/ipch/
+/*/*/Debug/
+/*/*/*/ipch/
+/*/*/*/Debug/
+*.opensdf
+*.suo
+*.sdf

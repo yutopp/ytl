@@ -6,7 +6,7 @@
 #include <vector>
 #include <iterator>
 
-namespace ytd
+namespace ytl
 {
 	namespace brainfuck
 	{
@@ -293,6 +293,6 @@ namespace ytd
 		}
 
 	} // namespace brainfuck
-} // namespace ytd
+} // namespace ytl
 
 #endif /*YTL_BRAINFUCK_INTERPRETER_HPP*/
