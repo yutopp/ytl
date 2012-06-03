@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <string>
+#include <utility>
 
 #include "../config.hpp"
 #include "../exception.hpp"
@@ -27,8 +28,11 @@ namespace ytl
 			{}
 
 			//          --------------------------------------------
+			YTL_ASM_OP_LAZY_1( db )
 			YTL_ASM_OP_BEGIN( db( byte_t v ) )	writer_.write( v ); YTL_ASM_OP_END
+			YTL_ASM_OP_LAZY_1( bw )
 			YTL_ASM_OP_BEGIN( dw( word_t v ) )	writer_.write( v ); YTL_ASM_OP_END
+			YTL_ASM_OP_LAZY_1( dd )
 			YTL_ASM_OP_BEGIN( dd( dword_t v ) )	writer_.write( v ); YTL_ASM_OP_END
 
 			//
@@ -54,10 +58,12 @@ namespace ytl
 			YTL_ASM_OP_END
 
 			//
+			YTL_ASM_OP_LAZY_1( resb )
 			YTL_ASM_OP_BEGIN( resb( std::size_t const count ) )
 				for( std::size_t i=0; i<count; ++i )
 					db( 0x00 );
 			YTL_ASM_OP_END
+			
 
 		private:
 			writer_type& writer_;

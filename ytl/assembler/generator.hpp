@@ -4,6 +4,7 @@
 #include <type_traits>
 #include <functional>
 
+#include <boost/proto/proto.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "config.hpp"
@@ -23,16 +24,19 @@ namespace ytl
 		class generator
 			: private boost::noncopyable
 		{
-			typedef Buffer									buffer_type;
-			typedef EndianWritter							endian_writer_type;
-			typedef Writer<buffer_type, endian_writer_type>	writer_type;
-			typedef typename writer_type::index_type		index_type;
-			typedef Engine<writer_type>						engine_type;
+			typedef Buffer													buffer_type;
+			typedef EndianWritter											endian_writer_type;
+			typedef Writer<buffer_type, endian_writer_type>					writer_type;
+			typedef typename writer_type::index_type						index_type;
+			typedef index_type const&										index_cref_type;
+			typedef Engine<writer_type>										engine_type;
+
+			typedef typename boost::proto::terminal<index_cref_type>::type	lazy_index_cref_type;
 			
 		public:
 			generator( buffer_type& buffer )
 				: writer_( buffer )
-				, $( writer_.get_index_ref() )
+				, $( lazy_index_cref_type::make( writer_.get_index_cref() ) )
 			{}
 
 			//
@@ -45,7 +49,7 @@ namespace ytl
 			writer_type writer_;
 
 		public:
-			index_type const& $;	// always pointing buffer index.
+			lazy_index_cref_type $;
 		};
 
 		template<template<typename> class Engine, typename Buffer>

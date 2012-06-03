@@ -36,7 +36,7 @@ namespace ytl
 				wrapper_.index_ += sizeof(T);
 			}
 
-			index_type const& get_index_ref() const
+			index_type const& get_index_cref() const
 			{
 				return wrapper_.index_;
 			}
@@ -76,7 +76,7 @@ namespace ytl
 				wrapper_.index_ += size;
 			}
 
-			index_type const& get_index_ref() const
+			index_type const& get_index_cref() const
 			{
 				return wrapper_.index_;
 			}

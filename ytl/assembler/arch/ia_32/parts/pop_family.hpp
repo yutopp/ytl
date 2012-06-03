@@ -1,4 +1,6 @@
 // POP
+YTL_ASM_OP_LAZY_1( pop )
+
 /*void push( m16 src )
 {
 	db( 0xff );

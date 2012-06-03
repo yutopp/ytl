@@ -1,4 +1,6 @@
 // PUSH
+YTL_ASM_OP_LAZY_1( push )
+
 YTL_ASM_OP_BEGIN( push( r_m16 src ) )
 	db( 0xff );
 	dmod_rm_sib_disp( src, 6 );

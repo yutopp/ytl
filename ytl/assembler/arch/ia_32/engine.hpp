@@ -28,6 +28,8 @@
 			opr8rm8,														\
 			opr16_32rm16_32													\
 			)																\
+	/**/																	\
+	YTL_ASM_OP_LAZY_2( name )												\
 	/* name AL, imm8 */														\
 	YTL_ASM_OP_BEGIN( name( registers::r8_t dst, int8_t src ) )				\
 		if ( dst == registers::al ) {										\
@@ -211,6 +213,8 @@ namespace ytl
 
 
 				// ARPL
+				YTL_ASM_OP_LAZY_2( arpl )
+
 				YTL_ASM_OP_BEGIN( arpl( r_m16 dst, registers::r16_t src ) )
 					db( 0x63 );
 					dmod_rm_sib_disp( dst, src );
@@ -226,6 +230,8 @@ namespace ytl
 				// -- I --
 
 				// INT 3, INT, INTO
+				YTL_ASM_OP_LAZY_1( int_ )
+
 				YTL_ASM_OP_BEGIN( int_( int8_t src ) )
 					if ( src == 3 ) {
 						db( 0xcc );
@@ -246,6 +252,8 @@ namespace ytl
 				// -- M --
 
 				// MOV
+				YTL_ASM_OP_LAZY_2( mov )
+
 				YTL_ASM_OP_BEGIN( mov( r_m8_implicit dst, registers::r8_t src ) )
 					db( 0x88 );
 					dmod_rm_sib_disp( dst, src );
@@ -283,10 +291,12 @@ namespace ytl
 					db( 0xb0 + dst );
 					db( src );
 				YTL_ASM_OP_END
+
 				YTL_ASM_OP_BEGIN( mov( registers::r16_t dst, int16_t src ) )
 					db( 0xb8 + dst );
 					dw( src );
 				YTL_ASM_OP_END
+
 				YTL_ASM_OP_BEGIN( mov( registers::r32_t dst, int32_t src ) )
 					db( 0xb8 + dst );
 					dd( src );
@@ -297,11 +307,13 @@ namespace ytl
 					dmod_rm_sib_disp( dst, 0 );
 					db( src );
 				YTL_ASM_OP_END
+
 				YTL_ASM_OP_BEGIN( mov( r_m16 dst, int16_t src ) )
 					db( 0xc7 );
 					dmod_rm_sib_disp( dst, 0 );
 					dw( src );
 				YTL_ASM_OP_END
+
 				YTL_ASM_OP_BEGIN( mov( r_m32 dst, int32_t src ) )
 					db( 0xc7 );
 					dmod_rm_sib_disp( dst, 0 );
