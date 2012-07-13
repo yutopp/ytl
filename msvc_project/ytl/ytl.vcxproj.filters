@@ -25,6 +25,18 @@
     <Filter Include="lib\assembler\arch\ia_32\parts">
       <UniqueIdentifier>{5768919e-3661-42e4-b193-e8dcfb18ae29}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\fileformat">
+      <UniqueIdentifier>{8c206a31-b0eb-468a-a96d-17738634a83f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\fileformat\pecoff">
+      <UniqueIdentifier>{3bda6a1d-5207-4582-9a11-96c9406b9934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\fileformat\pecoff\obj">
+      <UniqueIdentifier>{4fd45484-1d8e-4a24-87b2-81bfc28dc629}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\fileformat\archive">
+      <UniqueIdentifier>{ca5c3615-23ec-4615-a7f8-bd1918dc0257}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
@@ -104,6 +116,27 @@
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp">
       <Filter>lib\assembler\arch</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp">
+      <Filter>lib\fileformat\pecoff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\binary_holder.hpp">
+      <Filter>lib\fileformat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\config.hpp">
+      <Filter>lib\fileformat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp">
+      <Filter>lib\fileformat\pecoff\obj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp">
+      <Filter>lib\fileformat\pecoff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\utility.hpp">
+      <Filter>lib\fileformat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp">
+      <Filter>lib\fileformat\archive</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

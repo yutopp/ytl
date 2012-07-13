@@ -86,6 +86,13 @@
     <ClInclude Include="..\..\ytl\config\platform.hpp" />
     <ClInclude Include="..\..\ytl\config\typedef.hpp" />
     <ClInclude Include="..\..\ytl\config\windows.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\binary_holder.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\config.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\utility.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ytl\assembler\arch\ia_32\parts\pop_family.hpp" />

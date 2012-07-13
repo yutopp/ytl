@@ -23,17 +23,23 @@ namespace ytl
 		public:
 			typedef typename wrapper_type::index_type	index_type;
 
-			fixed_writer( Buffer& b )
-				: wrapper_( b )
+		public:
+			fixed_writer( Buffer& b, index_type const index = 0u )
+				: wrapper_( b, index )
 			{}
 
 			template<typename T>
-			void write( T const& v )
+			void write( T const& v, std::size_t const size = sizeof(T) )
 			{
+				if ( wrapper_.size() <= wrapper_.index_ + size )
+					throw std::exception();		// todo: cause error
+
 				writer_type::write(
-					reinterpret_cast<byte_t*>( wrapper_.data() ) + wrapper_.index_, std::addressof( v )
+					reinterpret_cast<byte_t*>( wrapper_.data() ) + wrapper_.index_,
+					std::addressof( v ),
+					size
 					);
-				wrapper_.index_ += sizeof(T);
+				wrapper_.index_ += size;
 			}
 
 			index_type const& get_index_cref() const
@@ -59,8 +65,9 @@ namespace ytl
 		public:
 			typedef typename wrapper_type::index_type	index_type;
 
-			variable_writer( Buffer& b )
-				: wrapper_( b )
+		public:
+			variable_writer( Buffer& b, index_type const index = 0u )
+				: wrapper_( b, index )
 			{}
 
 			template<typename T>

@@ -9,9 +9,9 @@
 namespace ytl { namespace assembler{
 	namespace detail {
 		template<typename T>
-		inline T evaluate( T&& e )
+		inline T&& evaluate( T&& v )
 		{
-			return std::forward<T>( v );
+			return v;
 		}
 
 		template<typename Expr>
@@ -40,7 +40,7 @@ namespace ytl { namespace assembler{
 			>::type* =0										\
 			)												\
 		)													\
-		boost::proto::default_context ctx;					\
+/*		boost::proto::default_context ctx;	*/				\
 		return name(										\
 			ytl::assembler::detail::evaluate( expr1 )		\
 			);												\

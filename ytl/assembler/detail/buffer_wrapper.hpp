@@ -33,8 +33,8 @@ namespace ytl
 			typedef typename buffer_type::value_type	value_type;
 			typedef std::size_t							index_type;
 
-			buffer_wrapper( buffer_type& b )
-				: index_( 0u )
+			buffer_wrapper( buffer_type& b, index_type const index = 0u )
+				: index_( index )
 				, buffer_( b )
 			{}
 
@@ -65,8 +65,8 @@ namespace ytl
 			typedef T				value_type;
 			typedef std::size_t		index_type;
 
-			buffer_wrapper( buffer_type b )
-				: index_( 0u )
+			buffer_wrapper( buffer_type b, index_type const index = 0u )
+				: index_( index )
 				, buffer_( b )
 			{}
 
@@ -81,7 +81,7 @@ namespace ytl
 			}
 
 			index_type index_;
-			buffer_type buffer_;
+			buffer_type buffer_;	// pointer
 		};
 
 	} // namespace assembler

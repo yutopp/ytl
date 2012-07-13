@@ -3,8 +3,6 @@
 
 #include <vector>
 
-#include <ytl/config/platform.hpp>
-
 #include "config.hpp"
 
 #ifdef YTL_WINDOWS
