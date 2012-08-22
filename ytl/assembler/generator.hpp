@@ -11,23 +11,12 @@
 #include "config.hpp"
 #include "writer.hpp"
 #include "endian_writer.hpp"
+#include "binary_holder.hpp"
 
 namespace ytl
 {
 	namespace assembler
 	{
-		struct append
-		{};
-
-		struct overwrite
-		{
-			explicit overwrite( std::size_t const pos )
-				: position( pos )
-			{}
-
-			std::size_t position;
-		};
-
 		template<
 			template<typename> class Engine,
 			template<typename, typename> class Writer = variable_writer,
@@ -36,54 +25,85 @@ namespace ytl
 		class generator
 			: private boost::noncopyable
 		{
-			typedef std::size_t			index_type;
-			typedef index_type const&	index_cref_type;
-			typedef typename boost::proto::terminal<
-				index_cref_type>::type	lazy_index_cref_type;
-			typedef EndianWritter		endian_writer_type;
+			typedef std::size_t											index_type;
+			typedef std::shared_ptr<index_type const>					index_const_ptr_type;
+			typedef EndianWritter										endian_writer_type;
+			
+			class index_wrapper;
+			typedef index_wrapper&										index_wrapper_ref_type;
+			typedef typename
+				boost::proto::terminal<index_wrapper_ref_type>::type	lazy_index_type;
+
+
 
 		public:
-			template<typename Buffer>
-			Engine<std::shared_ptr<Writer<Buffer, endian_writer_type>>> // engine_type
-			operator()( Buffer& buffer, append const = append() )
-			{
-				typedef typename Writer<Buffer, endian_writer_type>	writer_type;
-				typedef typename std::shared_ptr<writer_type>		writer_pointer_type;
-				typedef typename Engine<writer_pointer_type>		engine_type;
-
-				writer_pointer_type const writer_pointer(
-					std::make_shared<writer_type>( buffer, 0u )
-					);
-				$ = lazy_index_cref_type::make( writer_->get_index_cref() );
-
-				return engine_type( writer_ );
-			}
+			generator()
+				: index_wrapper_()
+				, $( lazy_index_type::make( std::ref( index_wrapper_ ) ) )
+			{}
 
 			template<typename Buffer>
-			Engine<std::shared_ptr<Writer<Buffer, endian_writer_type>>> // engine_type
-			operator()( Buffer& buffer, overwrite const tag )
+			Engine<Writer<Buffer, endian_writer_type>> // engine_type
+			operator()( Buffer& buffer, index_type const index = 0u )
 			{
 				typedef typename Writer<Buffer, endian_writer_type>	writer_type;
-				typedef typename std::shared_ptr<writer_type>		writer_pointer_type;
-				typedef typename Engine<writer_pointer_type>		engine_type;
+				typedef typename Engine<writer_type>				engine_type;
 
-				writer_pointer_type const writer_pointer(
-					std::make_shared<writer_type>( buffer, tag.position )
-					);
-				$ = lazy_index_cref_type::make( writer_->get_index_cref() );
+				auto const writer( std::make_shared<writer_type>( buffer, index ) );
+				auto const status( std::make_shared<detail::asm_status>() );
 
-				return engine_type( writer_ );
+				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
+
+				return engine_type( writer, status );
 			}
 
-		public:
-			lazy_index_cref_type $;
-		};
+			template<template <typename> class T>
+			Engine<Writer<typename binary_holder<T>::container_type, endian_writer_type>> // engine_type
+			operator()( binary_holder<T>& buffer, index_type const index = 0u )
+			{
+				typedef typename Writer<
+					typename binary_holder<T>::container_type,
+					endian_writer_type>								writer_type;
+				typedef typename Engine<writer_type>				engine_type;
 
-/*		template<template<typename> class Engine, typename Buffer>
-		generator<Engine, Buffer> make_generator( Buffer& b )
+				auto const writer( std::make_shared<writer_type>( *buffer, index ) );
+
+				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
+
+				return engine_type( writer, buffer.get_status() );
+			}
+
+		private:
+		class index_wrapper
 		{
-			return generator<Engine, Buffer>( b );
-		}*/
+		public:
+			index_wrapper()
+				: p_( nullptr )
+			{}
+
+			explicit index_wrapper( index_const_ptr_type p )
+				: p_( p )
+			{}
+
+			template<typename T>
+			index_type operator-( T const& rhs ) const
+			{
+				return *p_ - rhs
+			}
+
+			template<typename T>
+			friend index_type operator-( T const& lhs, index_wrapper const& rhs )
+			{
+				return lhs - *rhs.p_;
+			}
+
+		private:
+			index_const_ptr_type p_;
+		} index_wrapper_;
+
+		public:
+			lazy_index_type $;
+		};
 
 	} // namespace assembler
 } // namespace ytl

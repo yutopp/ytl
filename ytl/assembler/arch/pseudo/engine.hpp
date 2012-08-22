@@ -15,18 +15,21 @@ namespace ytl
 		{
 			template<typename Writer>
 			class engine
-				: public detail::pseudo_operations<engine, Writer>
+				: public detail::pseudo_operations<engine<Writer>, Writer>
 			{
-				typedef engine			self_type;
-
-				typedef Writer			writer_type;
-				typedef std::size_t		size_type;
-
-				typedef self_type		return_type;
+				typedef detail::pseudo_operations<engine, Writer>	base_type;
 
 			public:
-				engine( writer_type& w )
-					: pseudo_operations( w )
+				typedef typename base_type::writer_type				writer_type;
+				typedef typename base_type::writer_pointer_type		writer_pointer_type;
+				typedef typename base_type::status_type				status_type;
+				typedef typename base_type::status_pointer_type		status_pointer_type;
+				typedef typename base_type::size_type				size_type;
+				typedef typename base_type::return_type				return_type;
+
+			public:
+				engine( writer_type& w, detail::asm_status& s )
+					: pseudo_operations( w, s )
 				{}
 			};
 

@@ -4,14 +4,14 @@
 
 int main()
 {
-	namespace x86 = ytl::assembler::ia_32;
+	namespace x86 = ytl::assembler::x86;
 	using namespace x86::registers;
 	using namespace x86::alignment;
 
 	ytl::assembler::code_stub code( 2048 );
-	auto as = ytl::assembler::make_generator<x86::engine>( code );
+	ytl::assembler::generator<x86::engine> as;
 
-	as()
+	as( code )
 		.push	( ecx )			//test
 		.sub	( esp, 80 )		//
 

@@ -1,5 +1,5 @@
-#ifndef YTL_ASSEMBLER_DETAIL_WINDOWS_CODE_STUB_HPP
-#define YTL_ASSEMBLER_DETAIL_WINDOWS_CODE_STUB_HPP
+#ifndef YTL_ASSEMBLER_WINDOWS_RUNNABLE_BUFFER_ALLOCATOR_HPP
+#define YTL_ASSEMBLER_WINDOWS_RUNNABLE_BUFFER_ALLOCATOR_HPP
 
 #include <cstddef>
 #include <cstring>
@@ -13,10 +13,10 @@ namespace ytl
 {
 	namespace assembler
 	{
-		namespace detail
+		namespace windows
 		{
 			template<typename T>
-			class windows_runnable_buffer_allocator
+			class runnable_buffer_allocator
 			{
 			public:
 				typedef std::size_t size_type;
@@ -27,25 +27,21 @@ namespace ytl
 				typedef T const& const_reference;
 				typedef T value_type;
 
-				/*
-				*/
 				template<typename U>
 				struct rebind
 				{
-					typedef windows_runnable_buffer_allocator<U> other;
+					typedef runnable_buffer_allocator<U> other;
 				};
 	
-				/*
-				*/
-				windows_runnable_buffer_allocator() throw() {}
-				windows_runnable_buffer_allocator( windows_runnable_buffer_allocator const& ) throw() {}
+			public:
+				runnable_buffer_allocator() throw() {}
+				runnable_buffer_allocator( runnable_buffer_allocator const& ) throw() {}
 				template<typename U>
-				windows_runnable_buffer_allocator( windows_runnable_buffer_allocator<U>& ) throw() {}
+				runnable_buffer_allocator( runnable_buffer_allocator<U>& ) throw() {}
 
-				~windows_runnable_buffer_allocator() throw() {}
+				~runnable_buffer_allocator() throw() {}
 	
-				/*
-				*/
+
 				pointer allocate( size_type num, void const* hint = 0 )
 				{
 					pointer const p = reinterpret_cast<pointer>(
@@ -88,8 +84,8 @@ namespace ytl
 				}
 			};
 
-		} // namespace detail
+		} // namespace windows
 	} // namespace assembeler
 } // namespace ytl
 
-#endif /*YTL_ASSEMBLER_DETAIL_WINDOWS_CODE_STUB_HPP*/
+#endif /*YTL_ASSEMBLER_WINDOWS_RUNNABLE_BUFFER_ALLOCATOR_HPP*/

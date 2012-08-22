@@ -15,13 +15,16 @@ namespace ytl
 		{
 			typedef buffer_wrapper<Buffer>				wrapper_type;
 			typedef EndianWriter						writer_type;
+
 			static_assert(
 				sizeof( typename wrapper_type::value_type ) == 1,
 				__FILE__ " required element of buffer is 1."
 				);
 
 		public:
-			typedef typename wrapper_type::index_type	index_type;
+			typedef typename wrapper_type::index_type				index_type;
+			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
+			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
 
 		public:
 			fixed_writer( Buffer& b, index_type const index = 0u )
@@ -29,20 +32,20 @@ namespace ytl
 			{}
 
 			template<typename T>
-			void write( T const& v, std::size_t const size = sizeof(T) )
+			void write( T const* const p, std::size_t const size = sizeof(T) )
 			{
-				if ( wrapper_.size() <= wrapper_.index_ + size )
+				if ( wrapper_.size() <= *wrapper_.index_ + size )
 					throw std::exception();		// todo: cause error
 
 				writer_type::write(
-					reinterpret_cast<byte_t*>( wrapper_.data() ) + wrapper_.index_,
-					std::addressof( v ),
+					reinterpret_cast<byte_t*>( wrapper_.data() ) + *wrapper_.index_,
+					p,
 					size
 					);
-				wrapper_.index_ += size;
+				*wrapper_.index_ += size;
 			}
 
-			index_type const& get_index_cref() const
+			index_const_pointer_type get_index_ptr() const
 			{
 				return wrapper_.index_;
 			}
@@ -57,13 +60,16 @@ namespace ytl
 		{
 			typedef buffer_wrapper<Buffer>				wrapper_type;
 			typedef EndianWriter						writer_type;
+
 			static_assert(
 				sizeof( typename wrapper_type::value_type ) == 1,
 				__FILE__ " required element of buffer is 1."
 				);
 
 		public:
-			typedef typename wrapper_type::index_type	index_type;
+			typedef typename wrapper_type::index_type				index_type;
+			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
+			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
 
 		public:
 			variable_writer( Buffer& b, index_type const index = 0u )
@@ -71,19 +77,19 @@ namespace ytl
 			{}
 
 			template<typename T>
-			void write( T const& v, std::size_t const size = sizeof(T) )
+			void write( T const* const p, std::size_t const size = sizeof(T) )
 			{
 				extend_if_insufficient_buffer( size );
 
 				writer_type::write(
-					reinterpret_cast<byte_t*>( wrapper_.data() ) + wrapper_.index_,
-					std::addressof( v ),
+					reinterpret_cast<byte_t*>( wrapper_.data() ) + *wrapper_.index_,
+					p,
 					size
 					);
-				wrapper_.index_ += size;
+				*wrapper_.index_ += size;
 			}
 
-			index_type const& get_index_cref() const
+			index_const_pointer_type get_index_ptr() const
 			{
 				return wrapper_.index_;
 			}
@@ -91,7 +97,7 @@ namespace ytl
 		private:
 			inline void extend_if_insufficient_buffer( std::size_t const size )
 			{
-				if ( wrapper_.size() <= wrapper_.index_ + size )
+				if ( wrapper_.size() <= *wrapper_.index_ + size )
 					wrapper_.resize( wrapper_.size() + size );
 			}
 

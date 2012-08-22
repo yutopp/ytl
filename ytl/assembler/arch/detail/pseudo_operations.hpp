@@ -7,10 +7,11 @@
 #include <type_traits>
 #include <utility>
 
-#include "../config.hpp"
-#include "../exception.hpp"
+#include "../../config.hpp"
+#include "../../exception.hpp"
+#include "../utility.hpp"
 
-#include "utility.hpp"
+#include "asm_status.hpp"
 
 namespace ytl
 {
@@ -18,41 +19,55 @@ namespace ytl
 	{
 		namespace detail
 		{
-			template<template<typename> class Engine, typename Writer>
+			template<typename Derived, typename Writer>
 			class pseudo_operations
-			{
-				typedef Writer									writer_type;
-				typedef Engine<Writer>							derived_type;
-				typedef derived_type							return_type;
+			{			
+				typedef Derived							derived_type;
 
 			public:
-				pseudo_operations( writer_type const& w )
+				typedef Writer							writer_type;
+				typedef std::shared_ptr<writer_type>	writer_pointer_type;
+				typedef detail::asm_status				status_type;
+				typedef std::shared_ptr<status_type>	status_pointer_type;
+
+				typedef std::size_t						size_type;
+				typedef derived_type					return_type;
+
+			public:
+				pseudo_operations( writer_pointer_type w, status_pointer_type s )
 					: writer_( w )
+					, status_( s )
 				{}
 
 				//          --------------------------------------------
 				YTL_ASM_OP_LAZY_1( db )
-				YTL_ASM_OP_BEGIN( db( byte_t v ) )	writer_->write( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( db( byte_t v ) )	embed( v ); YTL_ASM_OP_END
 				YTL_ASM_OP_LAZY_1( bw )
-				YTL_ASM_OP_BEGIN( dw( word_t v ) )	writer_->write( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( dw( word_t v ) )	embed( v ); YTL_ASM_OP_END
 				YTL_ASM_OP_LAZY_1( dd )
-				YTL_ASM_OP_BEGIN( dd( dword_t v ) )	writer_->write( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( dd( dword_t v ) )	embed( v ); YTL_ASM_OP_END
 
 				//
 				template<typename T>
-				YTL_ASM_OP_BEGIN( embed( T const& v, std::size_t const size = sizeof(T) ) )
-					writer_->write( v, size );
+				inline YTL_ASM_OP_BEGIN( raw_embed( T const* const p, std::size_t const size ) )
+					writer_->write( p, size );
+				YTL_ASM_OP_END
+
+				//
+				template<typename T>
+				inline YTL_ASM_OP_BEGIN( embed( T const& v, std::size_t const size = sizeof(T) ) )
+					raw_embed( std::addressof( v ), size );
 				YTL_ASM_OP_END
 
 				//
 				template<typename CharT>
 				YTL_ASM_OP_BEGIN( msg( std::basic_string<CharT> const& str ) )
-					writer_->write( str.data(), str.size() * sizeof(CharT) );
+					raw_embed( str.c_str(), str.size() * sizeof(CharT) );
 				YTL_ASM_OP_END
 
 				template<typename CharT, std::size_t N>
 				YTL_ASM_OP_BEGIN( msg( CharT const (&str)[N] ) )
-					writer_->write( str, N * sizeof(CharT) );
+					embed( str, N * sizeof(CharT) );
 				YTL_ASM_OP_END
 
 				//
@@ -70,7 +85,7 @@ namespace ytl
 
 				std::size_t size() const
 				{
-					return static_cast<std::size_t>( writer_->get_index_cref() );
+					return writer_->get_index_cref();
 				}
 
 				YTL_ASM_OP_BEGIN( size( std::size_t& r ) )
@@ -78,7 +93,8 @@ namespace ytl
 				YTL_ASM_OP_END
 
 			private:
-				writer_type writer_;
+				writer_pointer_type writer_;
+				status_pointer_type status_;
 			};
 
 		} // namespace detail

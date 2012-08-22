@@ -5,9 +5,9 @@
 
 #include <boost/optional.hpp>
 
-#include "../../config.hpp"
-#include "../../binary_holder.hpp"
+#include <ytl/assembler.hpp>
 
+#include "../../config.hpp"
 #include "../structure.hpp"
 
 namespace ytl
@@ -21,8 +21,9 @@ namespace ytl
 				class reader
 				{
 				public:
-					typedef std::vector<section const>	sections_type;
-					typedef std::vector<symbol const>	symbols_type;
+					typedef std::vector<section const>			sections_type;
+					typedef std::vector<symbol const>			symbols_type;
+					typedef ytl::assembler::binary_holder<>		holder_type;
 
 				public:
 					template<typename CharT>
@@ -145,7 +146,8 @@ namespace ytl
 									);
 					}
 
-					binary_holder holder_;
+				private:
+					holder_type holder_;
 					::IMAGE_FILE_HEADER const* header_;
 
 					sections_type sections_;

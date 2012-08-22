@@ -11,7 +11,7 @@ namespace ytl { namespace assembler{
 		template<typename T>
 		inline T&& evaluate( T&& v )
 		{
-			return v;
+			return std::forward<T>( v );
 		}
 
 		template<typename Expr>

@@ -14,9 +14,9 @@ namespace ytl
 	typedef boost::uint16_t			uint16_t;
 	typedef boost::uint32_t			uint32_t;
 
-	typedef int8_t					byte_t;
-	typedef int16_t					word_t;
-	typedef	int32_t					dword_t;
+	typedef uint8_t					byte_t;
+	typedef uint16_t				word_t;
+	typedef	uint32_t				dword_t;
 
 /*	typedef boost::uint_least8_t	byte_t;
 	typedef boost::uint_least16_t	word_t;

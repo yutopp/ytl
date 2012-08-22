@@ -15,10 +15,11 @@
 #include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <ytl/assembler.hpp>
+
 #include <windows.h>
 
 #include "../config.hpp"
-#include "../binary_holder.hpp"
 
 namespace ytl
 {
@@ -33,7 +34,7 @@ namespace ytl
 				{
 					std::string name;
 					std::time_t date;
-					binary_holder value;
+					ytl::assembler::binary_holder<> value;
 				};
 
 
@@ -178,7 +179,7 @@ namespace ytl
 							archive result = {
 								name_context,
 								date,
-								binary_holder(
+								ytl::assembler::binary_holder<>(
 									binary_->data() + offset + sizeof( IMAGE_ARCHIVE_MEMBER_HEADER ),
 									binary_->data() + offset + sizeof( IMAGE_ARCHIVE_MEMBER_HEADER ) + size
 									)
@@ -214,7 +215,7 @@ namespace ytl
 							return size;
 						}
 						
-						binary_holder binary_;
+						ytl::assembler::binary_holder<> binary_;
 					};
 
 				} // namespace detail

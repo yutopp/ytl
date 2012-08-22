@@ -62,16 +62,23 @@
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\address.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\aliginment.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\data_types.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\engine.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\mov_family.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\parts\push_family.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\ia_32\registers.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\pseudo_operations.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\detail\asm_status.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\detail\pseudo_operations.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\detail\register_id.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\detail\value_wrapper.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\pseudo.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\pseudo\engine.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\address.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\aliginment.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\data_types.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\engine.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\mov_family.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\pop_family.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\arch\x86\registers.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\binary_holder.hpp" />
     <ClInclude Include="..\..\ytl\assembler\code_stub.hpp" />
     <ClInclude Include="..\..\ytl\assembler\config.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp" />
@@ -87,15 +94,12 @@
     <ClInclude Include="..\..\ytl\config\typedef.hpp" />
     <ClInclude Include="..\..\ytl\config\windows.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\binary_holder.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\config.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\ytl\assembler\arch\ia_32\parts\pop_family.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

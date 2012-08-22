@@ -122,18 +122,22 @@ namespace ytl
 		{
 			template<typename Writer>
 			class engine
-				: public detail::pseudo_operations<engine, Writer>
+				: public detail::pseudo_operations<engine<Writer>, Writer>
 			{
-				typedef engine			self_type;
-
-				typedef Writer			writer_type;
-				typedef std::size_t		size_type;
-
-				typedef self_type		return_type;
+				typedef detail::pseudo_operations<engine, Writer>	base_type;
+				typedef engine										self_type;
 
 			public:
-				engine( writer_type& w )
-					: pseudo_operations( w )
+				typedef typename base_type::writer_type				writer_type;
+				typedef typename base_type::writer_pointer_type		writer_pointer_type;
+				typedef typename base_type::status_type				status_type;
+				typedef typename base_type::status_pointer_type		status_pointer_type;
+				typedef typename base_type::size_type				size_type;
+				typedef typename base_type::return_type				return_type;
+
+			public:
+				engine( writer_pointer_type w, status_pointer_type s )
+					: pseudo_operations( w, s )
 				{}
 
 				/* -----------------------------------------------------
@@ -398,7 +402,7 @@ namespace ytl
 					void operator()( mod_rm32_sib_disp8 const& v ) const
 					{
 						engine_ptr_->db( make_mod_rm( v.mod_, reg_op_, v.rm_ ) );
-						engine_ptr_->db( :make_sib( v.sib_disp_.sib_.ss_, v.sib_disp_.sib_.index_, v.sib_disp_.sib_.base_ ) );
+						engine_ptr_->db( make_sib( v.sib_disp_.sib_.ss_, v.sib_disp_.sib_.index_, v.sib_disp_.sib_.base_ ) );
 						engine_ptr_->db( v.sib_disp_.disp_ );
 					}
 

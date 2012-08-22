@@ -12,12 +12,13 @@
 namespace ytl
 {
 	namespace assembler
-	{
+	{	
 #ifdef YTL_WINDOWS
-		namespace detail { typedef windows_runnable_buffer_allocator<byte_t> runnable_buffer_allocator; }
+		using windows::runnable_buffer_allocator;
 #endif
 
-		typedef std::vector<byte_t, detail::runnable_buffer_allocator> code_stub;
+		// 
+		typedef std::vector<byte_t, runnable_buffer_allocator<byte_t>> code_stub;
 
 	} // namespace assembeler
 } // namespace ytl

@@ -5,10 +5,9 @@
 #include <string>
 #include <iostream>
 
-#include "../config.hpp"
-#include "../binary_holder.hpp"
+#include <ytl/assembler.hpp>
 
-#include <Windows.h>
+#include "../config.hpp"
 
 namespace ytl
 {
@@ -16,6 +15,10 @@ namespace ytl
 	{
 		namespace pecoff
 		{
+			namespace image
+			{
+			} // nemespace image
+
 			// relocation information
 			class relocation
 			{
@@ -38,10 +41,11 @@ namespace ytl
 			class section
 			{
 			public:
-				typedef std::vector<relocation>	relocation_table_type;
+				typedef std::vector<relocation>				relocation_table_type;
+				typedef ytl::assembler::binary_holder<>		holder_type;
 
 			public:
-				section( binary_holder const& bin, ::IMAGE_SECTION_HEADER const* p )
+				section( holder_type const& bin, ::IMAGE_SECTION_HEADER const* p )
 				{
 					std::string const short_name( std::string( p->Name, p->Name + sizeof( p->Name ) ).c_str() );
 					auto const flags = p->Characteristics;
@@ -55,7 +59,7 @@ namespace ytl
 					//
 					if ( p->SizeOfRawData != 0 ) {
 						raw_data_ =
-							binary_holder( bin->data() + p->PointerToRawData, bin->data() + p->PointerToRawData + p->SizeOfRawData );
+							holder_type( bin->data() + p->PointerToRawData, bin->data() + p->PointerToRawData + p->SizeOfRawData );
 					}
 
 					// 
@@ -71,7 +75,7 @@ namespace ytl
 					std::cout << std::dec <<std::endl;
 				}
 
-				binary_holder const& get_raw_binary() const
+				holder_type const& get_raw_binary() const
 				{
 					return raw_data_;
 				}
@@ -83,7 +87,7 @@ namespace ytl
 
 			private:
 				std::string name_;
-				binary_holder raw_data_;
+				holder_type raw_data_;
 				relocation_table_type relocations_;
 			};
 
