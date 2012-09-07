@@ -134,9 +134,12 @@ namespace ytl
 			private:
 				unsigned int pe_start_;
 			};
-		}
-	}
-};
+
+
+
+		} // namespace pecoff
+	} // namespace fileformat
+} // namespace ytl
 
 
 #endif /*YTL_FILEFORMAT_PECOFF_EXEC_DOSSTUB_HPP*/

@@ -36,7 +36,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>D:\boost_1_51_0;D:\ytl;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include;</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -78,21 +80,23 @@
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\pop_family.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\x86\registers.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\binary_holder.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\code_stub.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\binary.hpp" />
     <ClInclude Include="..\..\ytl\assembler\config.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\detail\windows_code_stub.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\detail\windows_runnable_buffer_allocator.hpp" />
     <ClInclude Include="..\..\ytl\assembler\exception.hpp" />
     <ClInclude Include="..\..\ytl\assembler\generator.hpp" />
     <ClInclude Include="..\..\ytl\assembler\endian_writer.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\runnable_buffer_allocator.hpp" />
     <ClInclude Include="..\..\ytl\assembler\writer.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp" />
+    <ClInclude Include="..\..\ytl\config.hpp" />
     <ClInclude Include="..\..\ytl\config\platform.hpp" />
     <ClInclude Include="..\..\ytl\config\typedef.hpp" />
     <ClInclude Include="..\..\ytl\config\windows.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\config.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp" />
@@ -100,6 +104,12 @@
     <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp" />
+    <ClInclude Include="..\..\ytl\utility.hpp" />
+    <ClInclude Include="..\..\ytl\utility\dump.hpp" />
+    <ClInclude Include="..\..\ytl\utility\read_binary.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

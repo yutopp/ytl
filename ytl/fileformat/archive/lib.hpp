@@ -6,6 +6,8 @@
 
 #include <string>
 #include <vector>
+#include <map>
+#include <memory>
 #include <iterator>
 #include <algorithm>
 #include <iostream>
@@ -14,8 +16,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
-
-#include <ytl/assembler.hpp>
 
 #include <windows.h>
 
@@ -27,14 +27,15 @@ namespace ytl
 	{
 		namespace archive
 		{
-			namespace lib
+			namespace lib_detail
 			{
 				// data structure
+				template<typename Binary>
 				struct archive
 				{
 					std::string name;
 					std::time_t date;
-					ytl::assembler::binary_holder<> value;
+					Binary value;
 				};
 
 
@@ -244,6 +245,83 @@ namespace ytl
 				};
 
 			} // namespace lib
+
+			namespace lib_detail
+			{
+				template<typename Buffer>
+				struct archive
+				{
+					std::string name;
+					std::time_t date;
+					Buffer value;
+				};
+			}
+			
+			template<template <typename T> class Allocator>
+			class basic_lib
+			{
+				typedef Allocator										allocator_type;
+				typedef ytl::assembler::basic_binary<allocator_type>	binary_type;		
+				typedef std::shared_ptr<binary_type>					binary_pointer_type;
+
+			public:
+				typedef	lib_detail::archive<binary_type>				archive_type;
+				typedef std::string										key_type;
+				typedef std::size_t										index_type;
+
+			private:
+				basic_lib( binary_pointer_type p )
+					: raw_( p )
+				{
+					validate();
+					build_special_table();
+				}
+
+			public:
+
+
+				template<typename Dist, typename CharT, template <typename T> class AllocatorOther>
+				friend Dist built_object( CharT const* const filename, basic_lib<AllocatorOther>* );
+
+			private:
+				void validate() const
+				{
+					if ( (*raw_)->size() < IMAGE_ARCHIVE_START_SIZE )
+						throw std::exception( "Invalid lib format." );
+
+					if ( std::string( (*raw_)->cbegin(), (*raw_)->cbegin() + IMAGE_ARCHIVE_START_SIZE ) != IMAGE_ARCHIVE_START )
+						throw std::exception( "Invalid header." );
+				}
+
+				void build_special_table()
+				{
+				}
+
+			private:
+				std::map<key_type, index_type> memo_;
+				std::vector<archive> archives_;
+
+				lib_detail::first_linker_member<archive_type> first_;
+				lib_detail::second_linker_member<archive_type> second_;
+//				lib_detail::longname<archive> second_;
+				binary_pointer_type raw_;
+			};
+
+
+			typedef basic_lib<std::allocator> lib;
+
+
+
+			// read a binary from a file and build a object
+			template<typename Dist, typename CharT, template <typename T> class Allocator>
+			Dist build_object( CharT const* const filename, basic_lib<Allocator>* )
+			{
+				auto p = std::make_shared<ytl::assembler::basic_binary<Allocator>>();
+				ytl::assembler::read_binary<Other>( filename, *p );
+
+				return Dist( p );
+			}
+
 		} // namespace archive
 	} // namespace fileformat
 } // namespace ytl

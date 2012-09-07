@@ -46,12 +46,12 @@
     <Filter Include="lib\fileformat\pecoff\executable">
       <UniqueIdentifier>{51f2f2c1-395b-4b9d-ba4f-9d488b7155b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib\utility">
+      <UniqueIdentifier>{8f9b3af1-4e6e-40cd-9fd2-7530eb145ed9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
-      <Filter>lib\assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\code_stub.hpp">
       <Filter>lib\assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\config.hpp">
@@ -77,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="..\..\ytl\config\platform.hpp">
       <Filter>lib\config</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\detail\windows_code_stub.hpp">
-      <Filter>lib\assembler\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\exception.hpp">
       <Filter>lib\assembler</Filter>
@@ -162,11 +159,37 @@
     <ClInclude Include="..\..\ytl\assembler\arch\detail\asm_status.hpp">
       <Filter>lib\assembler\arch\detail</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\binary_holder.hpp">
-      <Filter>lib\assembler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp">
       <Filter>lib\fileformat\pecoff\executable</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat.hpp">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\detail\windows_runnable_buffer_allocator.hpp">
+      <Filter>lib\assembler\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\runnable_buffer_allocator.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\config.hpp">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\read_binary.hpp">
+      <Filter>lib\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility.hpp">
+      <Filter>lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\dump.hpp">
+      <Filter>lib\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\binary.hpp">
+      <Filter>lib\assembler</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp">
+      <Filter>lib\utility</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

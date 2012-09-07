@@ -9,23 +9,6 @@ namespace ytl
 {
 	namespace assembler
 	{
-		/* --------
-			template<typename T>
-			class buffer_wrapper
-
-			[Comments]
-			This is used by (fixed | variable)_writer.
-
-			[Require]
-			public:
-				typedef **** value_type;	: element's type of buffer.
-				typedef **** index_type;	: type of index.
-				size_type size() const		: return size of buffer.
-				value_type* data()			: return head address of buffer.
-			(for variable_writer)
-				void resize( size_type )	: resize buffer. it's required only when using variavle_writer.
-		-------- */
-
 		// default wraapper implemantation.
 		template<typename Buffer>
 		struct buffer_wrapper
@@ -57,6 +40,7 @@ namespace ytl
 				buffer_.resize( size );
 			}
 
+		public:
 			buffer_type& buffer_;
 			index_pointer_type index_;
 		};
@@ -87,7 +71,7 @@ namespace ytl
 				return &buffer_[0];
 			}
 
-			
+		public:
 			buffer_type buffer_;	// pointer
 			index_pointer_type index_;
 		};

@@ -17,7 +17,17 @@ namespace ytl
 		{
 			namespace image
 			{
-			} // nemespace image
+				struct relocation
+				{
+					union {
+						dword_t virtual_address;
+						dword_t reloc_count;             // Set to the real count when IMAGE_SCN_LNK_NRELOC_OVFL is set
+					};
+					dword_t symbol_table_index;
+					word_t type;
+				};
+			} // namespace image
+
 
 			// relocation information
 			class relocation
@@ -103,18 +113,20 @@ namespace ytl
 						return;
 
 					// if p->N.Name.Short is zero, use name_table
-					name_ = std::string(
-							( p->N.Name.Short == 0 ) ?
-							name_table + p->N.Name.Long :
-							std::string( p->N.ShortName, p->N.ShortName + sizeof( p->N.ShortName ) ).c_str()
-							);
+					name_ = ( p->N.Name.Short == 0 ) ?
+								std::string( name_table + p->N.Name.Long ):
+								std::string( p->N.ShortName, p->N.ShortName + sizeof( p->N.ShortName ) )
+								;
 		
 					section_index_ = p->SectionNumber - 1;	// Because, SectionNumber is 1-based.
+
 					//
 					std::cout
 						<< "is_short: " << ( p->N.Name.Short == 0 ) << "; offset : " << p->N.Name.Long << std::endl
 						<< "symbol_name: " << name_ << std::endl
-						<< "SectionNumber: " << p->SectionNumber << std::endl
+						<< "SectionNumber: " << (int)p->SectionNumber << std::endl
+						<< "StorageClass: " << (int)p->StorageClass << std::endl
+						<< "Value: " << (int)p->Value << std::endl
 						<< "Aux : " << (int)p->NumberOfAuxSymbols << std::endl
 						<< std::endl;
 				}

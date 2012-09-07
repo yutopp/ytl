@@ -8,10 +8,12 @@
 #include <boost/proto/proto.hpp>
 #include <boost/noncopyable.hpp>
 
+#include <ytl/utility.hpp>
+
 #include "config.hpp"
 #include "writer.hpp"
 #include "endian_writer.hpp"
-#include "binary_holder.hpp"
+#include "binary.hpp"
 
 namespace ytl
 {
@@ -34,8 +36,6 @@ namespace ytl
 			typedef typename
 				boost::proto::terminal<index_wrapper_ref_type>::type	lazy_index_type;
 
-
-
 		public:
 			generator()
 				: index_wrapper_()
@@ -44,29 +44,33 @@ namespace ytl
 
 			template<typename Buffer>
 			Engine<Writer<Buffer, endian_writer_type>> // engine_type
-			operator()( Buffer& buffer, index_type const index = 0u )
+			operator()( Buffer& buffer,
+						index_type const index = 0u,
+						typename std::enable_if<!ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
 			{
 				typedef typename Writer<Buffer, endian_writer_type>	writer_type;
 				typedef typename Engine<writer_type>				engine_type;
 
 				auto const writer( std::make_shared<writer_type>( buffer, index ) );
-				auto const status( std::make_shared<detail::asm_status>() );
+				std::shared_ptr<detail::asm_status> const status( new detail::asm_status );
 
 				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
-
-				return engine_type( writer, status );
+				
+				return engine_type( writer, status /*std::make_shared<detail::asm_status>()*/ );
 			}
 
-			template<template <typename> class T>
-			Engine<Writer<typename binary_holder<T>::container_type, endian_writer_type>> // engine_type
-			operator()( binary_holder<T>& buffer, index_type const index = 0u )
+			template<typename Buffer>
+			Engine<Writer<typename Buffer::wrapped_container_type, endian_writer_type>> // engine_type
+			operator()( Buffer& buffer,
+						index_type const index = 0u,
+						typename std::enable_if<ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
 			{
 				typedef typename Writer<
-					typename binary_holder<T>::container_type,
+					typename Buffer::wrapped_container_type,
 					endian_writer_type>								writer_type;
 				typedef typename Engine<writer_type>				engine_type;
 
-				auto const writer( std::make_shared<writer_type>( *buffer, index ) );
+				auto const writer( std::make_shared<writer_type>( buffer.get(), index ) );
 
 				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
 
@@ -74,32 +78,32 @@ namespace ytl
 			}
 
 		private:
-		class index_wrapper
-		{
-		public:
-			index_wrapper()
-				: p_( nullptr )
-			{}
-
-			explicit index_wrapper( index_const_ptr_type p )
-				: p_( p )
-			{}
-
-			template<typename T>
-			index_type operator-( T const& rhs ) const
+			class index_wrapper
 			{
-				return *p_ - rhs
-			}
+			public:
+				index_wrapper()
+					: p_( nullptr )
+				{}
 
-			template<typename T>
-			friend index_type operator-( T const& lhs, index_wrapper const& rhs )
-			{
-				return lhs - *rhs.p_;
-			}
+				explicit index_wrapper( index_const_ptr_type p )
+					: p_( p )
+				{}
 
-		private:
-			index_const_ptr_type p_;
-		} index_wrapper_;
+				template<typename T>
+				index_type operator-( T const& rhs ) const
+				{
+					return *p_ - rhs
+				}
+
+				template<typename T>
+				friend index_type operator-( T const& lhs, index_wrapper const& rhs )
+				{
+					return lhs - *rhs.p_;
+				}
+
+			private:
+				index_const_ptr_type p_;
+			} index_wrapper_;
 
 		public:
 			lazy_index_type $;

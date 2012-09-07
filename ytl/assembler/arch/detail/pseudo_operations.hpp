@@ -41,11 +41,20 @@ namespace ytl
 
 				//          --------------------------------------------
 				YTL_ASM_OP_LAZY_1( db )
-				inline YTL_ASM_OP_BEGIN( db( byte_t v ) )	embed( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( db( byte_t v ) )
+					embed( v );
+				YTL_ASM_OP_END
+
 				YTL_ASM_OP_LAZY_1( bw )
-				inline YTL_ASM_OP_BEGIN( dw( word_t v ) )	embed( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( dw( word_t v ) )
+					embed( v );
+				YTL_ASM_OP_END
+
 				YTL_ASM_OP_LAZY_1( dd )
-				inline YTL_ASM_OP_BEGIN( dd( dword_t v ) )	embed( v ); YTL_ASM_OP_END
+				inline YTL_ASM_OP_BEGIN( dd( dword_t v ) )
+					embed( v );
+				YTL_ASM_OP_END
+
 
 				//
 				template<typename T>

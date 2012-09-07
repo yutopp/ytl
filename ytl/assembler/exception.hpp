@@ -7,10 +7,10 @@ namespace ytl
 {
 	namespace assembler
 	{
-		class no_operator
+		class no_instruction
 			: public std::exception
 		{
-			no_operator( char const* msg = "no_operator") throw ()
+			no_instruction( char const* msg = "no_instruction") throw ()
 				: std::exception( msg )
 			{}
 
