@@ -4,11 +4,12 @@
 
 int main()
 {
-	namespace x86 = ytl::assembler::x86;
+	namespace yasm = ytl::assembler;
+	namespace x86 = yasm::x86;
 	using namespace x86::registers;
 	using namespace x86::alignment;
 
-	ytl::assembler::code_stub code( 2048 );
+	yasm::runnable_binary<int>code( 2048 );
 	ytl::assembler::generator<x86::engine> as;
 
 	as( code )
@@ -46,10 +47,8 @@ int main()
 		.ret	();
 
 
-	typedef int(*func_t)();
-
 	// Call genarated function code!
-	int const i = (reinterpret_cast<func_t>( &code[0] ))();
+	int const i = code.call<int>();
 
 	std::cout<< "result: " << i << std::endl;
 
