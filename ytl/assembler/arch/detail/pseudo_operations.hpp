@@ -9,9 +9,9 @@
 
 #include "../../config.hpp"
 #include "../../exception.hpp"
+#include "../../detail/status_holder.hpp"
 #include "../utility.hpp"
 
-#include "asm_status.hpp"
 
 namespace ytl
 {
@@ -21,20 +21,22 @@ namespace ytl
 		{
 			template<typename Derived, typename Writer>
 			class pseudo_operations
-			{			
-				typedef Derived							derived_type;
+			{
+				typedef Derived										derived_type;
 
 			public:
-				typedef Writer							writer_type;
-				typedef std::shared_ptr<writer_type>	writer_pointer_type;
-				typedef detail::asm_status				status_type;
-				typedef std::shared_ptr<status_type>	status_pointer_type;
+				typedef Writer										writer_type;
+				typedef std::shared_ptr<writer_type>				writer_shared_pointer;
 
-				typedef std::size_t						size_type;
-				typedef derived_type					return_type;
+				typedef detail::status_holder						status_type;
+				typedef detail::status_holder_shared_ptr			status_shared_pointer;
+				typedef detail::const_status_holder_shared_ptr		const_status_shared_pointer;
+
+				typedef std::size_t									size_type;
+				typedef derived_type								return_type;
 
 			public:
-				pseudo_operations( writer_pointer_type w, status_pointer_type s )
+				pseudo_operations( writer_shared_pointer w, status_shared_pointer s )
 					: writer_( w )
 					, status_( s )
 				{}
@@ -87,8 +89,9 @@ namespace ytl
 				//
 				YTL_ASM_OP_LAZY_1( resb )
 				YTL_ASM_OP_BEGIN( resb( std::size_t const count ) )
-					for( std::size_t i=0; i<count; ++i )
+					for( std::size_t i=0; i<count; ++i ) {
 						db( 0x00 );
+					}
 				YTL_ASM_OP_END
 				
 
@@ -102,8 +105,8 @@ namespace ytl
 				YTL_ASM_OP_END
 
 			private:
-				writer_pointer_type writer_;
-				status_pointer_type status_;
+				writer_shared_pointer writer_;
+				status_shared_pointer status_;
 			};
 
 		} // namespace detail

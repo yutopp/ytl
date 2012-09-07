@@ -6,7 +6,6 @@
 
 #include "../detail/pseudo_operations.hpp"
 
-
 namespace ytl
 {
 	namespace assembler
@@ -17,19 +16,22 @@ namespace ytl
 			class engine
 				: public detail::pseudo_operations<engine<Writer>, Writer>
 			{
-				typedef detail::pseudo_operations<engine, Writer>	base_type;
+				typedef engine											self_type;
+				typedef detail::pseudo_operations<self_type, Writer>	base_type;
 
 			public:
-				typedef typename base_type::writer_type				writer_type;
-				typedef typename base_type::writer_pointer_type		writer_pointer_type;
-				typedef typename base_type::status_type				status_type;
-				typedef typename base_type::status_pointer_type		status_pointer_type;
-				typedef typename base_type::size_type				size_type;
-				typedef typename base_type::return_type				return_type;
+				typedef typename self_type::writer_type					writer_type;
+				typedef typename self_type::writer_shared_pointer		writer_shared_pointer;
+
+				typedef typename self_type::status_type					status_type;
+				typedef typename self_type::status_shared_pointer		status_shared_pointer;
+
+				typedef typename self_type::size_type					size_type;
+				typedef typename self_type::return_type					return_type;
 
 			public:
-				engine( writer_type& w, detail::asm_status& s )
-					: pseudo_operations( w, s )
+				engine( writer_shared_pointer w, status_shared_pointer s )
+					: base_type( w, s )
 				{}
 			};
 

@@ -28,23 +28,44 @@
     <Filter Include="config">
       <UniqueIdentifier>{a627c097-6055-4147-8bfd-700fd0c7003d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utility">
+      <UniqueIdentifier>{8f9b3af1-4e6e-40cd-9fd2-7530eb145ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail">
+      <UniqueIdentifier>{b8e2c975-e9e0-49ef-b21c-6451ea401329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="buffer">
+      <UniqueIdentifier>{0f364d59-bcd9-40eb-b6e5-92c39331ad58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="buffer\detail">
+      <UniqueIdentifier>{92b98cba-4e27-4936-9c62-c49567ebdfbd}</UniqueIdentifier>
+    </Filter>
     <Filter Include="fileformat">
       <UniqueIdentifier>{8c206a31-b0eb-468a-a96d-17738634a83f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="fileformat\pecoff">
-      <UniqueIdentifier>{3bda6a1d-5207-4582-9a11-96c9406b9934}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="fileformat\pecoff\obj">
-      <UniqueIdentifier>{4fd45484-1d8e-4a24-87b2-81bfc28dc629}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="fileformat\pecoff\executable">
-      <UniqueIdentifier>{51f2f2c1-395b-4b9d-ba4f-9d488b7155b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="fileformat\archive">
       <UniqueIdentifier>{ca5c3615-23ec-4615-a7f8-bd1918dc0257}</UniqueIdentifier>
     </Filter>
-    <Filter Include="utility">
-      <UniqueIdentifier>{8f9b3af1-4e6e-40cd-9fd2-7530eb145ed9}</UniqueIdentifier>
+    <Filter Include="fileformat\object">
+      <UniqueIdentifier>{3bda6a1d-5207-4582-9a11-96c9406b9934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\object\pe">
+      <UniqueIdentifier>{51f2f2c1-395b-4b9d-ba4f-9d488b7155b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\object\coff">
+      <UniqueIdentifier>{f5891691-59e0-4276-8b4c-8abdc208ca9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\detail">
+      <UniqueIdentifier>{addc6d4f-37d3-4311-b2d1-4f8ed9d1d43b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\object\omf">
+      <UniqueIdentifier>{709fe8d8-f1da-4c4c-8a09-01e1d5db7391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\object\anon">
+      <UniqueIdentifier>{847cb9a8-55a4-401c-a6db-5b69b60553a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\object\common">
+      <UniqueIdentifier>{ad7c0b3c-69d9-4005-bcc7-e9a5ca512136}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -87,23 +108,11 @@
     <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp">
       <Filter>assembler\arch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp">
-      <Filter>fileformat\pecoff</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\config.hpp">
       <Filter>fileformat</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp">
-      <Filter>fileformat\pecoff\obj</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp">
-      <Filter>fileformat\pecoff</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp">
       <Filter>fileformat</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp">
-      <Filter>fileformat\archive</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\detail\pseudo_operations.hpp">
       <Filter>assembler\arch\detail</Filter>
@@ -147,36 +156,111 @@
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp">
       <Filter>assembler\arch\x86\operation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\arch\detail\asm_status.hpp">
-      <Filter>assembler\arch\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp">
-      <Filter>fileformat\pecoff\executable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\detail\windows_runnable_buffer_allocator.hpp">
-      <Filter>assembler\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\runnable_buffer_allocator.hpp">
-      <Filter>assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\utility\read_binary.hpp">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\utility\dump.hpp">
       <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler\binary.hpp">
-      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck.hpp" />
     <ClInclude Include="..\..\ytl\config.hpp" />
     <ClInclude Include="..\..\ytl\fileformat.hpp" />
     <ClInclude Include="..\..\ytl\utility.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\pe\dos_stub.hpp">
+      <Filter>fileformat\object\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\coff.hpp">
+      <Filter>fileformat\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\pe.hpp">
+      <Filter>fileformat\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\coff\image.hpp">
+      <Filter>fileformat\object\coff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\coff\core.hpp">
+      <Filter>fileformat\object\coff</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\config\compiler.hpp">
+      <Filter>config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\detail\packed_2_begin.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\detail\packed_2_end.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\archive\ar.hpp">
+      <Filter>fileformat\archive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\detail\windows_runnable_buffer_allocator.hpp">
+      <Filter>buffer\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\runnable_buffer_allocator.hpp">
+      <Filter>buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\binary_buffer.hpp">
+      <Filter>buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\file_mapped_binary_buffer.hpp">
+      <Filter>buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\detail\binary_buffer_base.hpp">
+      <Filter>buffer\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\detail\status_holder.hpp">
+      <Filter>assembler\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\detail\valid_buffer_holder.hpp">
+      <Filter>fileformat\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\detail\utils.hpp">
+      <Filter>fileformat\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\guard_macros.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\read_binary_file.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\read_binary_file_core.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\mapping_binary_file_core.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\mapping_binary_file.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\shared_binary_range.hpp">
+      <Filter>buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\detail\binary_range_traits.hpp">
+      <Filter>buffer\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler\binary_code.hpp">
+      <Filter>assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\omf.hpp">
+      <Filter>fileformat\object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\omf\core.hpp">
+      <Filter>fileformat\object\omf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\anon\image.hpp">
+      <Filter>fileformat\object\anon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\common\image.hpp">
+      <Filter>fileformat\object\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\object\anon\core.hpp">
+      <Filter>fileformat\object\anon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp">
+    <ClCompile Include="..\..\ytl\utility\alignment.hpp">
       <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ytl\fileformat\object\pe\accessor.hpp">
+      <Filter>fileformat\object\pe</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

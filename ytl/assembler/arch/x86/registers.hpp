@@ -1,7 +1,6 @@
 #ifndef YTL_ASSEMBLER_X86_REGISTERS_HPP
 #define YTL_ASSEMBLER_X86_REGISTERS_HPP
 
-#include "../../config.hpp"
 #include "../detail/register_id.hpp"
 
 namespace ytl
@@ -14,7 +13,7 @@ namespace ytl
 			{
 				// 8bit register
 				typedef detail::register_id<8> r8_t;
-				static const r8_t
+				const r8_t
 					al( 0 ),
 					cl( 1 ),
 					dl( 2 ),
@@ -27,7 +26,7 @@ namespace ytl
 
 				// 16bit register
 				typedef detail::register_id<16> r16_t;
-				static const r16_t
+				const r16_t
 					ax( 0 ),
 					cx( 1 ),
 					dx( 2 ),
@@ -40,22 +39,22 @@ namespace ytl
 
 				// 16bit segment register
 				typedef detail::register_id<1600> es_t;
-				static const es_t es( 0 );
+				const es_t es( 0 );
 
 				typedef detail::register_id<1601> cs_t;
-				static const cs_t cs( 1 );
+				const cs_t cs( 1 );
 
 				typedef detail::register_id<1602> ss_t;
-				static const ss_t ss( 2 );
+				const ss_t ss( 2 );
 
 				typedef detail::register_id<1603> ds_t;
-				static const ds_t ds( 3 );
+				const ds_t ds( 3 );
 
 				typedef detail::register_id<1604> fs_t;
-				static const fs_t fs( 4 );
+				const fs_t fs( 4 );
 
 				typedef detail::register_id<1605> gs_t;
-				static const gs_t gs( 5 );
+				const gs_t gs( 5 );
 
 
 				// 32bit register

@@ -23,7 +23,7 @@ namespace ytl
 #elif YTL_BIG_ENDIAN
 
 #else
-# error ""
+# error "ƒ{"
 #endif
 				}
 			};

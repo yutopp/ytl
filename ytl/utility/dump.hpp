@@ -4,73 +4,106 @@
 #include <cstdio>
 #include <cstddef>
 
-#include <ytl/config.hpp>
+#include <string>
 
-#include "has_wrapped_container_type.hpp"
+#include <boost/lexical_cast.hpp>
+
+#include <ytl/config.hpp>
 
 namespace ytl
 {
 	namespace detail
 	{
-		template<template Buffer>
-		void dumpbin_impl( Buffer const& bin, std::size_t const offset, std::size_t size, typename std::enable_if<!has_wrapped_container_type::value>::type* =0 )
+		template<std::size_t N, typename Buffer>
+		void dumpbin_impl(
+			Buffer const& bin,
+			std::size_t offset,
+			std::size_t size
+			)
 		{
-			if ( size == 0 ) {
-				size = bin->size();
-			}
-			if ( offset >= bin->size() ) {
+			static std::size_t const width = 16;
+
+			if ( offset >= bin.size() ) {
 				return;
 			}
 
-			std::printf( "         " );
-			for( std::size_t i=0; i<16; ++i ) {
+			if ( size < 0 ) {
+				size = bin.size();
+			} else if ( size > bin.size() + offset ) {
+				size = bin.size() + offset;
+			}
+
+			std::string const space( N + 3, ' ' ), left_format( "%0" + boost::lexical_cast<std::string>( N ) + "X | " );
+
+			std::printf( space.c_str() );
+			for( unsigned i=0; i<width; ++i ) {
 				std::printf( "%02X ", i );
 			}
 			std::printf( "\n" );
 
-			std::printf( "         " );
-			for( std::size_t i=0; i<16; ++i ) {
-				std::printf( "-- ", i );
+			std::printf( space.c_str() );
+			for( std::size_t i=0; i<width; ++i ) {
+				std::printf( "-- " );
+			}
+			std::printf( "  " );
+			for( std::size_t i=0; i<width/2; ++i ) {
+				std::printf( "-+" );
 			}
 			std::printf( "\n" );
 
-			auto it = bin->cbegin() + offset;
-			for( std::size_t i=0; i<size/16; ++i ) {
-				std::printf( "%06X | ", offset + i * 16 );
-				{
-					auto tempit = it;
-					for( std::size_t j=0; j<16; ++j, ++tempit ) {
-						if ( tempit != bin->cend() ) {
-							std::printf( "%02X ", static_cast<unsigned char>( *tempit ) );
+			auto it = bin.begin() + offset;
+			std::size_t line = 0;
+			do {
+				// address
+				std::printf( left_format.c_str(), offset + line * width );
+
+				// binary
+				[&, it]() mutable {
+					for( auto i=0; i<width; ++i ) {
+						if ( it < bin.end() ) {
+							std::printf( "%02X ", static_cast<unsigned char>( *it ) );
+							++it;
 						} else {
 							std::printf( "   " );
 						}
 					}
-				}
+				}();
 				std::printf( "| " );
 
-				for( std::size_t j=0; j<16; ++j, ++it ) {
-					if ( it != bin->cend() ) {
-						std::printf( "%c", ( *it < 0x20 || *it > 0x7e ) ? '.' : *it );
-					} else {
-						std::printf( " " );
+				// ascii
+				[&, it]() mutable {
+					for( auto i=0; i<width; ++i ) {
+						if ( it < bin.end() ) {
+							std::printf( "%c", ( *it < 0x20 || *it > 0x7e ) ? '.' : *it );
+							++it;
+						} else {
+							std::printf( " " );
+						}
+					}
+				}();
+				std::printf( "\n" );
+
+				for( auto i=0; i<width; ++i ) {
+					if ( it < bin.end() ) {
+						++it;
 					}
 				}
-				std::printf( "\n" );
-			}
+				++line;
+			} while( line < ( size + size % width ) / width );
 		}
 
-		template<typename Buffer>
-		inline void dumpbin_impl( Buffer const& bin, std::size_t const offset, std::size_t size, typename std::enable_if<has_wrapped_container_type::value>::type* =0 )
-		{
-			dumpbin_impl( (*bin), offset, size );
-		}
 	} // namespace detail
 
 	template<typename Buffer>
-	inline void dumpbin( Buffer const& bin, std::size_t const offset = 0, std::size_t size = 0 )
+	inline void dumpbin32( Buffer const& bin, std::size_t const offset = 0, std::size_t size = -1 )
 	{
-		detail::dumpbin_impl( bin, offset, size );
+		detail::dumpbin_impl<8>( bin, offset, size );
+	}
+
+	template<typename Buffer>
+	inline void dumpbin64( Buffer const& bin, std::size_t const offset = 0, std::size_t size = -1 )
+	{
+		detail::dumpbin_impl<16>( bin, offset, size );
 	}
 
 } // namespace ytl

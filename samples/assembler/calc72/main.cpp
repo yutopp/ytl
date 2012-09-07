@@ -1,3 +1,10 @@
+char const* const instruction_add_name = "add %1%, %2%";
+
+int first_step[256] = {
+	4
+};
+
+
 #include <ytl/assembler.hpp>
 
 #include <iostream>
@@ -9,11 +16,11 @@ int main()
 	using namespace x86::registers;
 	using namespace x86::alignment;
 
-	yasm::runnable_binary<int>code( 2048 );
+	yasm::runnable_binary code( 2048 );
 	ytl::assembler::generator<x86::engine> as;
 
 	as( code )
-		.push	( ecx )			//test
+		.push	( ecx )			// test
 		.sub	( esp, 80 )		//
 
 		.mov	( ebx, esp )
@@ -48,7 +55,8 @@ int main()
 
 
 	// Call genarated function code!
-	int const i = code.call<int>();
+	typedef int (*callable)();
+	int const i = ( *reinterpret_cast<callable>( code->data() ) )();
 
 	std::cout<< "result: " << i << std::endl;
 

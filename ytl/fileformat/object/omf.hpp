@@ -1,0 +1,6 @@
+#ifndef YTL_FILEFORMAT_OBJECT_OMF_HPP
+#define YTL_FILEFORMAT_OBJECT_OMF_HPP
+
+#include "omf/core.hpp"
+
+#endif /*YTL_FILEFORMAT_OBJECT_OMF_HPP*/

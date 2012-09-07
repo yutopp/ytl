@@ -3,5 +3,6 @@
 
 #include "config/typedef.hpp"
 #include "config/platform.hpp"
+#include "config/compiler.hpp"
 
 #endif /*YTL_CONFIG_HPP*/
