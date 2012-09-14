@@ -1,195 +1,182 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="lib">
-      <UniqueIdentifier>{86265079-b45f-40b2-8289-13040d4d67a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\assembler">
+    <Filter Include="assembler">
       <UniqueIdentifier>{c22201e9-8b92-4876-86e5-7193934c7855}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\assembler\detail">
+    <Filter Include="assembler\detail">
       <UniqueIdentifier>{6c3ccc41-216e-49d0-87fc-f471d5774cb0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\assembler\arch">
+    <Filter Include="assembler\arch">
       <UniqueIdentifier>{8b0d167f-29dd-4a02-8db2-0e57b174a120}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\brainfuck">
-      <UniqueIdentifier>{0e2e9c5e-7569-4fe0-9ff3-6b10a94d6203}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\config">
-      <UniqueIdentifier>{a627c097-6055-4147-8bfd-700fd0c7003d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\fileformat">
-      <UniqueIdentifier>{8c206a31-b0eb-468a-a96d-17738634a83f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\fileformat\pecoff">
-      <UniqueIdentifier>{3bda6a1d-5207-4582-9a11-96c9406b9934}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\fileformat\pecoff\obj">
-      <UniqueIdentifier>{4fd45484-1d8e-4a24-87b2-81bfc28dc629}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\fileformat\archive">
-      <UniqueIdentifier>{ca5c3615-23ec-4615-a7f8-bd1918dc0257}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\assembler\arch\detail">
+    <Filter Include="assembler\arch\detail">
       <UniqueIdentifier>{9d0416c9-7df6-4627-9ff7-cb201903101a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\assembler\arch\x86">
+    <Filter Include="assembler\arch\x86">
       <UniqueIdentifier>{22c50bd1-0d80-4d5c-9f75-42674298062a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\assembler\arch\pseudo">
-      <UniqueIdentifier>{a5de3b1f-ede5-4965-a9c0-9c17ec4c907c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lib\assembler\arch\x86\operation">
+    <Filter Include="assembler\arch\x86\operation">
       <UniqueIdentifier>{0e9303cc-f6be-4f28-b0c3-ca49302c1332}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\fileformat\pecoff\executable">
+    <Filter Include="assembler\arch\pseudo">
+      <UniqueIdentifier>{a5de3b1f-ede5-4965-a9c0-9c17ec4c907c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="brainfuck">
+      <UniqueIdentifier>{0e2e9c5e-7569-4fe0-9ff3-6b10a94d6203}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{a627c097-6055-4147-8bfd-700fd0c7003d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat">
+      <UniqueIdentifier>{8c206a31-b0eb-468a-a96d-17738634a83f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\pecoff">
+      <UniqueIdentifier>{3bda6a1d-5207-4582-9a11-96c9406b9934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\pecoff\obj">
+      <UniqueIdentifier>{4fd45484-1d8e-4a24-87b2-81bfc28dc629}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fileformat\pecoff\executable">
       <UniqueIdentifier>{51f2f2c1-395b-4b9d-ba4f-9d488b7155b9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\utility">
+    <Filter Include="fileformat\archive">
+      <UniqueIdentifier>{ca5c3615-23ec-4615-a7f8-bd1918dc0257}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utility">
       <UniqueIdentifier>{8f9b3af1-4e6e-40cd-9fd2-7530eb145ed9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\config.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp">
-      <Filter>lib\assembler\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\assembler.hpp">
-      <Filter>lib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\brainfuck.hpp">
-      <Filter>lib</Filter>
+      <Filter>assembler\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp">
-      <Filter>lib\brainfuck</Filter>
+      <Filter>brainfuck</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\config\typedef.hpp">
-      <Filter>lib\config</Filter>
+      <Filter>config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\config\windows.hpp">
-      <Filter>lib\config</Filter>
+      <Filter>config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\config\platform.hpp">
-      <Filter>lib\config</Filter>
+      <Filter>config</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\exception.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\generator.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\writer.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp">
-      <Filter>lib\assembler\detail</Filter>
+      <Filter>assembler\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\endian_writer.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\utility.hpp">
-      <Filter>lib\assembler\arch</Filter>
+      <Filter>assembler\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp">
-      <Filter>lib\fileformat\pecoff</Filter>
+      <Filter>fileformat\pecoff</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\config.hpp">
-      <Filter>lib\fileformat</Filter>
+      <Filter>fileformat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp">
-      <Filter>lib\fileformat\pecoff\obj</Filter>
+      <Filter>fileformat\pecoff\obj</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp">
-      <Filter>lib\fileformat\pecoff</Filter>
+      <Filter>fileformat\pecoff</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp">
-      <Filter>lib\fileformat</Filter>
+      <Filter>fileformat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp">
-      <Filter>lib\fileformat\archive</Filter>
+      <Filter>fileformat\archive</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\detail\pseudo_operations.hpp">
-      <Filter>lib\assembler\arch\detail</Filter>
+      <Filter>assembler\arch\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\detail\register_id.hpp">
-      <Filter>lib\assembler\arch\detail</Filter>
+      <Filter>assembler\arch\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\detail\value_wrapper.hpp">
-      <Filter>lib\assembler\arch\detail</Filter>
+      <Filter>assembler\arch\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\pseudo.hpp">
-      <Filter>lib\assembler\arch</Filter>
+      <Filter>assembler\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86.hpp">
-      <Filter>lib\assembler\arch</Filter>
+      <Filter>assembler\arch</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\pseudo\engine.hpp">
-      <Filter>lib\assembler\arch\pseudo</Filter>
+      <Filter>assembler\arch\pseudo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\address.hpp">
-      <Filter>lib\assembler\arch\x86</Filter>
+      <Filter>assembler\arch\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\aliginment.hpp">
-      <Filter>lib\assembler\arch\x86</Filter>
+      <Filter>assembler\arch\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\data_types.hpp">
-      <Filter>lib\assembler\arch\x86</Filter>
+      <Filter>assembler\arch\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\engine.hpp">
-      <Filter>lib\assembler\arch\x86</Filter>
+      <Filter>assembler\arch\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\registers.hpp">
-      <Filter>lib\assembler\arch\x86</Filter>
+      <Filter>assembler\arch\x86</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\mov_family.hpp">
-      <Filter>lib\assembler\arch\x86\operation</Filter>
+      <Filter>assembler\arch\x86\operation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\pop_family.hpp">
-      <Filter>lib\assembler\arch\x86\operation</Filter>
+      <Filter>assembler\arch\x86\operation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp">
-      <Filter>lib\assembler\arch\x86\operation</Filter>
+      <Filter>assembler\arch\x86\operation</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\arch\detail\asm_status.hpp">
-      <Filter>lib\assembler\arch\detail</Filter>
+      <Filter>assembler\arch\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp">
-      <Filter>lib\fileformat\pecoff\executable</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat.hpp">
-      <Filter>lib</Filter>
+      <Filter>fileformat\pecoff\executable</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\windows_runnable_buffer_allocator.hpp">
-      <Filter>lib\assembler\detail</Filter>
+      <Filter>assembler\detail</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\runnable_buffer_allocator.hpp">
-      <Filter>lib\assembler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\config.hpp">
-      <Filter>lib</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\utility\read_binary.hpp">
-      <Filter>lib\utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\ytl\utility.hpp">
-      <Filter>lib</Filter>
+      <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\utility\dump.hpp">
-      <Filter>lib\utility</Filter>
+      <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\binary.hpp">
-      <Filter>lib\assembler</Filter>
+      <Filter>assembler</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\ytl\assembler.hpp" />
+    <ClInclude Include="..\..\ytl\brainfuck.hpp" />
+    <ClInclude Include="..\..\ytl\config.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat.hpp" />
+    <ClInclude Include="..\..\ytl\utility.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp">
-      <Filter>lib\utility</Filter>
+      <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

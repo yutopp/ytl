@@ -48,7 +48,7 @@ int main()
 
 
 	// Call genarated function code!
-	int const i = code();
+	int const i = code.call<int>();
 
 	std::cout<< "result: " << i << std::endl;
 

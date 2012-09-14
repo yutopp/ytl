@@ -1,7 +1,9 @@
 /*/*/ipch/
 /*/*/Debug/
+/*/*/TestResults/
 /*/*/*/ipch/
 /*/*/*/Debug/
+/*/*/*/TestResults/
 *.opensdf
 *.suo
 *.sdf

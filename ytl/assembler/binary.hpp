@@ -78,7 +78,10 @@ namespace ytl
 		};
 
 
-		//
+		// ----------------------------------------------------------------------------------------------------
+
+
+		// normal
 		template<template <typename T> class Allocator>
 		class basic_binary
 			: public basic_raw_binary<Allocator>
@@ -124,6 +127,61 @@ namespace ytl
 			asm_status_pointer_type status_;
 		};
 
+
+		// runnable
+		template<>
+		class basic_binary<runnable_buffer_allocator>
+			: public basic_raw_binary<runnable_buffer_allocator>
+		{
+		public:
+			typedef basic_binary								this_type;
+			typedef basic_raw_binary<runnable_buffer_allocator>	base_type;
+
+			typedef base_type::value_type						value_type;
+			typedef base_type::allocator_type					allocator_type;
+			typedef base_type::wrapped_container_type			wrapped_container_type;
+			typedef base_type::size_type						size_type;
+
+			typedef detail::asm_status							asm_status_type;
+			typedef std::shared_ptr<asm_status_type>			asm_status_pointer_type;
+			typedef std::shared_ptr<asm_status_type const>		asm_status_const_pointer_type;
+
+		public:
+			basic_binary()
+			{}
+			
+			basic_binary( size_type const size )
+				: base_type( size )
+			{}
+
+			template<typename IterT>
+			basic_binary( IterT const& begin, IterT const& end )
+				: base_type( begin, end )
+			{}
+
+			template<template <typename T> class OtherA>
+			basic_binary( basic_binary<OtherA> const & rhs )
+				: base_type( rhs )
+			{}
+
+			template<typename ReturnT>
+			ReturnT cast_call( /*prms*/ ) const
+			{
+				typedef ReturnT(*function_type)( /*prms*/ );
+				return (*reinterpret_cast<function_type>( &(*this)->data()[0] ))( /*args*/ );
+			}
+
+			asm_status_pointer_type get_status() { return status_; }
+			asm_status_const_pointer_type get_status() const { return status_; }
+
+		private:
+			asm_status_pointer_type status_;
+		};
+
+
+		// ----------------------------------------------------------------------------------------------------
+
+
 		template<template <typename> class T, template <typename> class U>
 		inline basic_raw_binary<T>& operator<<( basic_raw_binary<T>& lhs, basic_raw_binary<U> const& rhs )
 		{
@@ -152,52 +210,9 @@ namespace ytl
 		// default binary holder
 		typedef basic_binary<std::allocator> binary;
 
+		// runnable binary holder
+		typedef basic_binary<runnable_buffer_allocator> runnable_binary;
 
-		//
-		template<typename ResultT>
-		class runnable_binary
-			: public basic_binary<runnable_buffer_allocator>
-		{
-		public:
-			typedef runnable_binary								this_type;
-			typedef basic_binary<runnable_buffer_allocator>		base_type;
-
-			typedef base_type::value_type						value_type;
-			typedef base_type::allocator_type					allocator_type;
-			typedef base_type::wrapped_container_type			wrapped_container_type;
-			typedef base_type::size_type						size_type;
-
-			typedef base_type::asm_status_type					asm_status_type;
-			typedef base_type::asm_status_pointer_type			asm_status_pointer_type;
-			typedef base_type::asm_status_const_pointer_type	asm_status_const_pointer_type;
-
-			typedef ResultT										result_type;
-
-		public:
-			runnable_binary()
-			{}
-			
-			runnable_binary( size_type const size )
-				: base_type( size )
-			{}
-
-			template<typename IterT>
-			runnable_binary( IterT const& begin, IterT const& end )
-				: base_type( begin, end )
-			{}
-
-			result_type operator()() const
-			{
-				return cast_call<result_type>( /* std::forward<Args>()... */ );
-			}
-
-			template<typename ReturnT>
-			ReturnT cast_call( /*prms*/ ) const
-			{
-				typedef ReturnT(*function_type)( /*prms*/ );
-				return (*reinterpret_cast<function_type>( &(*this)->data()[0] ))( /*args*/ );
-			}
-		};
 
 	} // namespace assembler
 } // namespace ytl
