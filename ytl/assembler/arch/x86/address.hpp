@@ -175,15 +175,16 @@ namespace ytl
 			struct mod_rm_disp
 				: public mod_rm<N>
 			{
-				typedef typename DispT::value_type value_type;
+				typedef mod_rm<N>					base_type;
+				typedef typename DispT::value_type	value_type;
 
 				mod_rm_disp( byte_t mod, DispT const& disp )
-					: mod_rm( mod, disp.reg_.get() )
+					: base_type( mod, disp.reg_.get() )
 					, disp_( disp.value_ )
 				{}
 	
 				mod_rm_disp( byte_t mod, byte_t rm, value_type disp_value )
-					: mod_rm( mod, rm )
+					: base_type( mod, rm )
 					, disp_( disp_value )
 				{}
 
@@ -202,8 +203,10 @@ namespace ytl
 			struct mod_rm32_sib
 				: public mod_rm<32>
 			{
+				typedef mod_rm<32>					base_type;
+
 				mod_rm32_sib( byte_t mod, byte_t rm, sib_value const& sib )
-					: mod_rm( mod, rm )
+					: base_type( mod, rm )
 					, sib_( sib )
 				{}
 
@@ -214,10 +217,11 @@ namespace ytl
 			struct mod_rm32_sib_disp
 				: public mod_rm<32>
 			{
-				typedef sib_disp_value<typename DispT::value_type> value_type;
+				typedef mod_rm<32>									base_type;
+				typedef sib_disp_value<typename DispT::value_type>	value_type;
 			
 				mod_rm32_sib_disp( byte_t mod, byte_t rm, value_type const& disp_value )
-					: mod_rm( mod, rm )
+					: base_type( mod, rm )
 					, sib_disp_( disp_value )
 				{}
 
@@ -269,16 +273,17 @@ namespace ytl
 			struct implicit_r_m
 				: public detail::value_wrapper<T>
 			{
+				typedef detail::value_wrapper<T>		base_type;
 				implicit_r_m( T value )	// implicit
-					: value_wrapper( value )
+					: base_type( value )
 				{}
 
 				implicit_r_m( detail::value_wrapper<T> value )
-					: value_wrapper( value )
+					: base_type( value )
 				{}
 
 				implicit_r_m( detail::register_id<N> reg )
-					: value_wrapper( mod_rm<N>( reg ) )
+					: base_type( mod_rm<N>( reg ) )
 				{}
 			};
 			typedef implicit_r_m<8, r_m8_addressing>	r_m8_implicit;

@@ -1,7 +1,7 @@
 #ifndef YTL_ASSEMBLER_VALIE_WRAPPER_HPP
 #define YTL_ASSEMBLER_VALIE_WRAPPER_HPP
 
-#include "../config.hpp"
+#include "../../config.hpp"
 
 namespace ytl
 {

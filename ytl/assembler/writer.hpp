@@ -11,54 +11,9 @@ namespace ytl
 	namespace assembler
 	{
 		template<typename Buffer, typename EndianWriter>
-		class fixed_writer
-		{
-			typedef buffer_wrapper<Buffer>				wrapper_type;
-			typedef EndianWriter						writer_type;
-
-			static_assert(
-				sizeof( typename wrapper_type::value_type ) == 1,
-				__FILE__ " required element of buffer is 1."
-				);
-
-		public:
-			typedef typename wrapper_type::index_type				index_type;
-			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
-			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
-
-		public:
-			fixed_writer( Buffer& b, index_type const index = 0u )
-				: wrapper_( b, index )
-			{}
-
-			template<typename T>
-			void write( T const* const p, std::size_t const size = sizeof(T) )
-			{
-				if ( wrapper_.size() <= *wrapper_.index_ + size )
-					throw std::exception();		// todo: cause error
-
-				writer_type::write(
-					reinterpret_cast<byte_t*>( wrapper_.data() ) + *wrapper_.index_,
-					p,
-					size
-					);
-				*wrapper_.index_ += size;
-			}
-
-			index_const_pointer_type get_index_ptr() const
-			{
-				return wrapper_.index_;
-			}
-
-		private:
-			wrapper_type wrapper_;
-		};
-
-
-		template<typename Buffer, typename EndianWriter>
 		class variable_writer
 		{
-			typedef buffer_wrapper<Buffer>				wrapper_type;
+			typedef detail::buffer_wrapper<Buffer>		wrapper_type;
 			typedef EndianWriter						writer_type;
 
 			static_assert(
@@ -102,6 +57,68 @@ namespace ytl
 			}
 
 			wrapper_type wrapper_;
+		};
+
+
+		template<typename Buffer, typename EndianWriter>
+		class fixed_writer
+		{
+			typedef detail::buffer_wrapper<Buffer>		wrapper_type;
+			typedef EndianWriter						writer_type;
+
+			static_assert(
+				sizeof( typename wrapper_type::value_type ) == 1,
+				__FILE__ " required element of buffer is 1."
+				);
+
+		public:
+			typedef typename wrapper_type::index_type				index_type;
+			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
+			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
+
+		public:
+			fixed_writer( Buffer& b, index_type const index = 0u )
+				: wrapper_( b, index )
+			{}
+
+			template<typename T>
+			void write( T const* const p, std::size_t const size = sizeof(T) )
+			{
+				if ( wrapper_.size() <= *wrapper_.index_ + size )
+					throw std::exception();		// todo: cause error
+
+				writer_type::write(
+					reinterpret_cast<byte_t*>( wrapper_.data() ) + *wrapper_.index_,
+					p,
+					size
+					);
+				*wrapper_.index_ += size;
+			}
+
+			index_const_pointer_type get_index_ptr() const
+			{
+				return wrapper_.index_;
+			}
+
+		private:
+			wrapper_type wrapper_;
+		};
+
+
+
+		// meta function
+		template<typename Buffer, typename EndianWriter>
+		struct suitable_writer
+		{
+		private:
+			template<typename T>
+			static auto check( T const& t ) -> decltype( t.resize(), std::declval<variable_writer<Buffer, EndianWriter>>() );
+
+			template<typename T>
+			static fixed_writer<Buffer, EndianWriter> check();
+
+		public:
+			typedef decltype( check<Buffer>() )		type;
 		};
 
 	} // namespace assembler

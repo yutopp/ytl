@@ -29,8 +29,8 @@
 	/* name AL, imm8 */														\
 	YTL_ASM_OP_BEGIN( name( registers::r8_t dst, int8_t src ) )				\
 		if ( dst == registers::al ) {										\
-			db( op8accimm8 );												\
-			db( src );														\
+			po::db( op8accimm8 );											\
+			po::db( src );													\
 		} else {															\
 			name( r_m8( mod_rm8( dst ) ), src );							\
 		}																	\
@@ -38,8 +38,8 @@
 	/* name AX, imm16 */													\
 	YTL_ASM_OP_BEGIN( name( registers::r16_t dst, int16_t src ) )			\
 		if ( dst == registers::ax ) {										\
-			db( op16_32accimm16_32 );										\
-			dw( src );														\
+			po::db( op16_32accimm16_32 );									\
+			po::dw( src );													\
 		} else {															\
 			name( r_m16( mod_rm16( dst ) ), src );							\
 		}																	\
@@ -47,72 +47,72 @@
 	/* name EAX, imm32 */													\
 	YTL_ASM_OP_BEGIN( name( registers::r32_t dst, int32_t src ) )			\
 		if ( dst == registers::eax ) {										\
-			db( op16_32accimm16_32 );										\
-			dd( src );														\
+			po::db( op16_32accimm16_32 );									\
+			po::dd( src );													\
 		} else {															\
 			name( r_m32( mod_rm32( dst ) ), src );							\
 		}																	\
 	YTL_ASM_OP_END															\
 	/* name r/m8, imm8 */													\
 	YTL_ASM_OP_BEGIN( name( r_m8 dst, int8_t src ) )						\
-		db( oprm8imm8 );													\
+		po::db( oprm8imm8 );												\
 		dmod_rm_sib_disp( dst, op_code );									\
-		db( src );															\
+		po::db( src );														\
 	YTL_ASM_OP_END															\
 	/* name r/m16, imm16 */													\
 	YTL_ASM_OP_BEGIN( name( r_m16 dst, int16_t src ) )						\
-		db( oprm16_32imm16_32 );											\
+		po::db( oprm16_32imm16_32 );										\
 		dmod_rm_sib_disp( dst, op_code );									\
-		dw( src );															\
+		po::dw( src );														\
 	YTL_ASM_OP_END															\
 	/* name r/m32, imm32 */													\
 	YTL_ASM_OP_BEGIN( name( r_m32 dst, int32_t src ) )						\
-		db( oprm16_32imm16_32 );											\
+		po::db( oprm16_32imm16_32 );										\
 		dmod_rm_sib_disp( dst, op_code );									\
-		dd( src );															\
+		po::dd( src );														\
 	YTL_ASM_OP_END															\
 	/* name r/m16, imm8 */													\
 	YTL_ASM_OP_BEGIN( name( r_m16 dst, int8_t src ) )						\
-		db( oprm16_32imm8 );												\
+		po::db( oprm16_32imm8 );											\
 		dmod_rm_sib_disp( dst, op_code );									\
-		db( src );															\
+		po::db( src );														\
 	YTL_ASM_OP_END															\
 	/* name r/m32, imm8 */													\
 	YTL_ASM_OP_BEGIN( name( r_m32 dst, int8_t src ) )						\
-		db( oprm16_32imm8 );												\
+		po::db( oprm16_32imm8 );											\
 		dmod_rm_sib_disp( dst, op_code );									\
-		db( src );															\
+		po::db( src );														\
 	YTL_ASM_OP_END															\
 	/* name r/m8, r8 */														\
 	YTL_ASM_OP_BEGIN( name( r_m8_implicit dst, registers::r8_t src ) )		\
-		db( oprm8r8 );														\
+		po::db( oprm8r8 );													\
 		dmod_rm_sib_disp( dst, src );										\
 	YTL_ASM_OP_END															\
 	/* name r/m16, r16 */													\
 	YTL_ASM_OP_BEGIN( name( r_m16_implicit dst, registers::r16_t src ) )	\
-		db( oprm16_32r16_32 );												\
+		po::db( oprm16_32r16_32 );											\
 		dmod_rm_sib_disp( dst, src );										\
 	YTL_ASM_OP_END															\
 	/* name r/m32, r32 */													\
 	YTL_ASM_OP_BEGIN( name( r_m32_implicit dst, registers::r32_t src ) )	\
-		db( oprm16_32r16_32 );												\
+		po::db( oprm16_32r16_32 );											\
 		dmod_rm_sib_disp( dst, src );										\
 	YTL_ASM_OP_END															\
 	/* name r8, r/m8 */														\
 	YTL_ASM_OP_BEGIN( name( registers::r8_t dst, r_m8 src ) )				\
-		db( opr8rm8 );														\
+		po::db( opr8rm8 );													\
 		dmod_rm_sib_disp( dst, src );										\
 	YTL_ASM_OP_END															\
 	/* name r16, r/m16 */													\
 	YTL_ASM_OP_BEGIN( name( registers::r16_t dst, r_m16 src ) )				\
-		db( opr16_32rm16_32 );												\
+		po::db( opr16_32rm16_32 );											\
 		dmod_rm_sib_disp( dst, src );										\
 	YTL_ASM_OP_END															\
 	/* name r32, r/m32 */													\
 	YTL_ASM_OP_BEGIN( name( registers::r32_t dst, r_m32 src ) )				\
-		db( opr16_32rm16_32 );												\
+		po::db( opr16_32rm16_32 );											\
 		dmod_rm_sib_disp( dst, src );										\
-	YTL_ASM_OP_END															\
+	YTL_ASM_OP_END
 
 namespace ytl
 {
@@ -127,6 +127,8 @@ namespace ytl
 				typedef detail::pseudo_operations<engine, Writer>	base_type;
 				typedef engine										self_type;
 
+				typedef base_type									po;	// means pseudo_operations...
+
 			public:
 				typedef typename base_type::writer_type				writer_type;
 				typedef typename base_type::writer_pointer_type		writer_pointer_type;
@@ -137,7 +139,7 @@ namespace ytl
 
 			public:
 				engine( writer_pointer_type w, status_pointer_type s )
-					: pseudo_operations( w, s )
+					: base_type( w, s )
 				{}
 
 				/* -----------------------------------------------------
@@ -150,14 +152,14 @@ namespace ytl
 
 				// AAA
 				YTL_ASM_OP_BEGIN( aaa() )
-					db( 0x37 );
+					po::db( 0x37 );
 				YTL_ASM_OP_END
 
 
 				// AAD
 				YTL_ASM_OP_BEGIN( aad() )
-					db( 0xd5 );
-					db( 0x0a );
+					po::db( 0xd5 );
+					po::db( 0x0a );
 				YTL_ASM_OP_END
 				/*// AAD ib
 				YTL_ASM_OP_BEGIN aad( byte_value dst ) { db( 0xd5 ); db( dst ); }*/
@@ -165,8 +167,8 @@ namespace ytl
 
 				// AAM
 				YTL_ASM_OP_BEGIN( aam() )
-					db( 0xd4 );
-					db( 0x0a );
+					po::db( 0xd4 );
+					po::db( 0x0a );
 				YTL_ASM_OP_END
 				/*// AAM ib
 				YTL_ASM_OP_BEGIN aam( byte_value dst ) { db( 0xD4 ); db( dst ); }*/
@@ -174,12 +176,12 @@ namespace ytl
 
 				// AAS
 				YTL_ASM_OP_BEGIN( aas() )
-					db( 0x3f );
+					po::db( 0x3f );
 				YTL_ASM_OP_END
 
 
 				// ADC
-				YTL_ASM_TYPICAL_OPERATION( adc, 0x14, 0x15, 2, 0x80, 0x81, 0x83, 0x10, 0x11, 0x12, 0x13 )
+//				YTL_ASM_TYPICAL_OPERATION( adc, 0x14, 0x15, 2, 0x80, 0x81, 0x83, 0x10, 0x11, 0x12, 0x13 )
 
 
 				// ADD
@@ -200,7 +202,7 @@ namespace ytl
 
 
 				// AND
-				YTL_ASM_TYPICAL_OPERATION( and, 0x24, 0x25, 4, 0x80, 0x81, 0x83, 0x20, 0x21, 0x22, 0x23 )
+//				YTL_ASM_TYPICAL_OPERATION( and, 0x24, 0x25, 4, 0x80, 0x81, 0x83, 0x20, 0x21, 0x22, 0x23 )
 
 
 				// ANDPD
@@ -216,7 +218,7 @@ namespace ytl
 				YTL_ASM_OP_LAZY_2( arpl )
 
 				YTL_ASM_OP_BEGIN( arpl( r_m16 dst, registers::r16_t src ) )
-					db( 0x63 );
+					po::db( 0x63 );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 
@@ -234,15 +236,15 @@ namespace ytl
 
 				YTL_ASM_OP_BEGIN( int_( int8_t src ) )
 					if ( src == 3 ) {
-						db( 0xcc );
+						po::db( 0xcc );
 					} else {
-						db( 0xcd );
-						db( src );
+						po::db( 0xcd );
+						po::db( src );
 					}
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( into() )
-					db( 0xce );
+					po::db( 0xce );
 				YTL_ASM_OP_END
 
 
@@ -255,31 +257,31 @@ namespace ytl
 				YTL_ASM_OP_LAZY_2( mov )
 
 				YTL_ASM_OP_BEGIN( mov( r_m8_implicit dst, registers::r8_t src ) )
-					db( 0x88 );
+					po::db( 0x88 );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 					
 				YTL_ASM_OP_BEGIN( mov( r_m16_implicit dst, registers::r16_t src ) )
-					db( 0x88 );
+					po::db( 0x88 );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( r_m32_implicit dst, registers::r32_t src ) )
-					db( 0x89 );
+					po::db( 0x89 );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( registers::r8_t dst, r_m8 src ) )
-					db( 0x8a );
+					po::db( 0x8a );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( registers::r16_t dst, r_m16 src ) )
-					db( 0x8a );
+					po::db( 0x8a );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( registers::r32_t dst, r_m32 src ) )
-					db( 0x8b );
+					po::db( 0x8b );
 					dmod_rm_sib_disp( dst, src );
 				YTL_ASM_OP_END
 
@@ -288,36 +290,36 @@ namespace ytl
 
 
 				YTL_ASM_OP_BEGIN( mov( registers::r8_t dst, int8_t src ) )
-					db( 0xb0 + dst );
-					db( src );
+					po::db( 0xb0 + dst );
+					po::db( src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( registers::r16_t dst, int16_t src ) )
-					db( 0xb8 + dst );
-					dw( src );
+					po::db( 0xb8 + dst );
+					po::dw( src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( registers::r32_t dst, int32_t src ) )
-					db( 0xb8 + dst );
-					dd( src );
+					po::db( 0xb8 + dst );
+					po::dd( src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( r_m8 dst, int8_t src ) )
-					db( 0xc6 );
+					po::db( 0xc6 );
 					dmod_rm_sib_disp( dst, 0 );
-					db( src );
+					po::db( src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( r_m16 dst, int16_t src ) )
-					db( 0xc7 );
+					po::db( 0xc7 );
 					dmod_rm_sib_disp( dst, 0 );
-					dw( src );
+					po::dw( src );
 				YTL_ASM_OP_END
 
 				YTL_ASM_OP_BEGIN( mov( r_m32 dst, int32_t src ) )
-					db( 0xc7 );
+					po::db( 0xc7 );
 					dmod_rm_sib_disp( dst, 0 );
-					dd( src );
+					po::dd( src );
 				YTL_ASM_OP_END
 
 				// -- N --
@@ -340,7 +342,7 @@ namespace ytl
 				// -- Q --
 				// -- R --
 				YTL_ASM_OP_BEGIN( ret() )
-					db( 0xc3 );
+					po::db( 0xc3 );
 				YTL_ASM_OP_END
 
 				// -- S --

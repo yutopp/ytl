@@ -1,9 +1,9 @@
 #ifndef YTL_ASSEMBLER_GENERATOR_HPP
 #define YTL_ASSEMBLER_GENERATOR_HPP
 
-#include <type_traits>
 #include <memory>
 #include <functional>
+#include <type_traits>
 
 #include <boost/proto/proto.hpp>
 #include <boost/noncopyable.hpp>
@@ -21,7 +21,6 @@ namespace ytl
 	{
 		template<
 			template<typename> class Engine,
-			template<typename, typename> class Writer = variable_writer,
 			typename EndianWritter = assembler::endian::little
 		>
 		class generator
@@ -43,13 +42,13 @@ namespace ytl
 			{}
 
 			template<typename Buffer>
-			Engine<Writer<Buffer, endian_writer_type>> // engine_type
+			Engine<typename suitable_writer<Buffer, endian_writer_type>::type> // engine_type
 			operator()( Buffer& buffer,
 						index_type const index = 0u,
 						typename std::enable_if<!ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
 			{
-				typedef typename Writer<Buffer, endian_writer_type>	writer_type;
-				typedef typename Engine<writer_type>				engine_type;
+				typedef typename suitable_writer<Buffer, endian_writer_type>::type		writer_type;
+				typedef Engine<writer_type>												engine_type;
 
 				auto const writer( std::make_shared<writer_type>( buffer, index ) );
 				std::shared_ptr<detail::asm_status> const status( new detail::asm_status );
@@ -60,15 +59,15 @@ namespace ytl
 			}
 
 			template<typename Buffer>
-			Engine<Writer<typename Buffer::wrapped_container_type, endian_writer_type>> // engine_type
+			Engine<typename suitable_writer<typename Buffer::wrapped_container_type, endian_writer_type>::type> // engine_type
 			operator()( Buffer& buffer,
 						index_type const index = 0u,
 						typename std::enable_if<ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
 			{
-				typedef typename Writer<
-					typename Buffer::wrapped_container_type,
-					endian_writer_type>								writer_type;
-				typedef typename Engine<writer_type>				engine_type;
+				typedef typename Buffer::wrapped_container_type								buffer_type;
+
+				typedef typename suitable_writer<buffer_type, endian_writer_type>::type		writer_type;
+				typedef Engine<writer_type>													engine_type;
 
 				auto const writer( std::make_shared<writer_type>( buffer.get(), index ) );
 
@@ -92,7 +91,7 @@ namespace ytl
 				template<typename T>
 				index_type operator-( T const& rhs ) const
 				{
-					return *p_ - rhs
+					return *p_ - rhs;
 				}
 
 				template<typename T>

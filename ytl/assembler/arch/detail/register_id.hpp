@@ -1,7 +1,7 @@
 #ifndef YTL_ASSEMBLER_REGISTER_ID_HPP
 #define YTL_ASSEMBLER_REGISTER_ID_HPP
 
-#include "../config.hpp"
+#include "../../config.hpp"
 
 namespace ytl
 {

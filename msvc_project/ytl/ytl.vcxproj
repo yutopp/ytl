@@ -66,7 +66,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\arch\detail\asm_status.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\detail\pseudo_operations.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\detail\register_id.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\detail\value_wrapper.hpp" />
@@ -86,31 +85,41 @@
     <ClInclude Include="..\..\ytl\assembler\config.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\detail\windows_runnable_buffer_allocator.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\detail\status_holder.hpp" />
     <ClInclude Include="..\..\ytl\assembler\exception.hpp" />
     <ClInclude Include="..\..\ytl\assembler\generator.hpp" />
     <ClInclude Include="..\..\ytl\assembler\endian_writer.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\runnable_buffer_allocator.hpp" />
     <ClInclude Include="..\..\ytl\assembler\writer.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck.hpp" />
     <ClInclude Include="..\..\ytl\brainfuck\interpreter.hpp" />
+    <ClInclude Include="..\..\ytl\buffer\binary_buffer.hpp" />
+    <ClInclude Include="..\..\ytl\buffer\detail\binary_buffer_base.hpp" />
+    <ClInclude Include="..\..\ytl\buffer\detail\windows_runnable_buffer_allocator.hpp" />
+    <ClInclude Include="..\..\ytl\buffer\file_mapped_binary_buffer.hpp" />
+    <ClInclude Include="..\..\ytl\buffer\runnable_buffer_allocator.hpp" />
     <ClInclude Include="..\..\ytl\config.hpp" />
+    <ClInclude Include="..\..\ytl\config\compiler.hpp" />
     <ClInclude Include="..\..\ytl\config\platform.hpp" />
     <ClInclude Include="..\..\ytl\config\typedef.hpp" />
     <ClInclude Include="..\..\ytl\config\windows.hpp" />
+    <ClInclude Include="..\..\ytl\detail\packed_2_begin.hpp" />
+    <ClInclude Include="..\..\ytl\detail\packed_2_end.hpp" />
     <ClInclude Include="..\..\ytl\fileformat.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\archive\lib.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\archive\ar.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\config.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\executable\dos_stub.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\obj\obj.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\pecoff\structure.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\detail.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\coff.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\coff\core.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\coff\image.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\pe.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\pe\dos_stub.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp" />
     <ClInclude Include="..\..\ytl\utility.hpp" />
     <ClInclude Include="..\..\ytl\utility\dump.hpp" />
     <ClInclude Include="..\..\ytl\utility\read_binary.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ytl\utility\alignment.hpp" />
     <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

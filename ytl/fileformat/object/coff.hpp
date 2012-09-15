@@ -1,0 +1,6 @@
+#ifndef YTL_FILEFORMAT_OBJECT_COFF_HPP
+#define YTL_FILEFORMAT_OBJECT_COFF_HPP
+
+#include "coff/core.hpp"
+
+#endif /*YTL_FILEFORMAT_OBJECT_COFF_HPP*/

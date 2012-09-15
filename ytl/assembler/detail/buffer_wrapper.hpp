@@ -9,73 +9,77 @@ namespace ytl
 {
 	namespace assembler
 	{
-		// default wraapper implemantation.
-		template<typename Buffer>
-		struct buffer_wrapper
+		namespace detail
 		{
-			typedef Buffer								buffer_type;
-			typedef typename buffer_type::value_type	value_type;
-			typedef std::size_t							index_type;
-			typedef std::shared_ptr<index_type>			index_pointer_type;
-			typedef std::shared_ptr<index_type const>	index_const_pointer_type;
-
-		public:
-			buffer_wrapper( buffer_type& b, index_type const index = 0u )
-				: buffer_( b )
-				, index_( std::make_shared<index_type>( index ) )
-			{}
-
-			std::size_t size() const
+			// default wraapper implemantation.
+			template<typename Buffer>
+			struct buffer_wrapper
 			{
-				return buffer_.size();
-			}
+				typedef Buffer								buffer_type;
+				typedef typename buffer_type::value_type	value_type;
+				typedef std::size_t							index_type;
+				typedef std::shared_ptr<index_type>			index_pointer_type;
+				typedef std::shared_ptr<index_type const>	index_const_pointer_type;
 
-			value_type* data()
+			public:
+				buffer_wrapper( buffer_type& b, index_type const index = 0u )
+					: buffer_( b )
+					, index_( std::make_shared<index_type>( index ) )
+				{}
+
+				std::size_t size() const
+				{
+					return buffer_.size();
+				}
+
+				value_type* data()
+				{
+					return &buffer_[0];
+				}
+
+				void resize( std::size_t const size )
+				{
+					buffer_.resize( size );
+				}
+
+			public:
+				buffer_type& buffer_;
+				index_pointer_type index_;
+			};
+
+			// fixed size.
+			template<typename T, std::size_t N>
+			struct buffer_wrapper<T[N]>
 			{
-				return &buffer_[0];
-			}
+				typedef T*									buffer_type;
+				typedef T									value_type;
+				typedef std::size_t							index_type;
+				typedef std::shared_ptr<index_type>			index_pointer_type;
+				typedef std::shared_ptr<index_type const>	index_const_pointer_type;
 
-			void resize( std::size_t const size )
-			{
-				buffer_.resize( size );
-			}
+			public:
+				buffer_wrapper( buffer_type b, index_type const index = 0u )
+					: buffer_( b )
+					, index_( std::make_shared<index_type>( index ) )
+				{}
 
-		public:
-			buffer_type& buffer_;
-			index_pointer_type index_;
-		};
+				std::size_t size() const
+				{
+					return N;
+				}
 
-		// fixed size.
-		template<typename T, std::size_t N>
-		struct buffer_wrapper<T[N]>
-		{
-			typedef T*									buffer_type;
-			typedef T									value_type;
-			typedef std::size_t							index_type;
-			typedef std::shared_ptr<index_type>			index_pointer_type;
-			typedef std::shared_ptr<index_type const>	index_const_pointer_type;
+				value_type* data()
+				{
+					return &buffer_[0];
+				}
 
-		public:
-			buffer_wrapper( buffer_type b, index_type const index = 0u )
-				: buffer_( b )
-				, index_( std::make_shared<index_type>( index ) )
-			{}
+	//			void resize( std::size_t ) {}
 
-			std::size_t size() const
-			{
-				return N;
-			}
-
-			value_type* data()
-			{
-				return &buffer_[0];
-			}
-
-		public:
-			buffer_type buffer_;	// pointer
-			index_pointer_type index_;
-		};
-
+			public:
+				buffer_type buffer_;	// pointer
+				index_pointer_type index_;
+			};
+		} // namespace detail
 	} // namespace assembler
 } // namespace ytl
 

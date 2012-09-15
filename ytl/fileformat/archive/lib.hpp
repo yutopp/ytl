@@ -266,7 +266,6 @@ namespace ytl
 				private:
 					binary_pointer_type p_;
 				};
-
 			public:
 				typedef	lib_detail::archive<binary_type>			archive_type;
 				typedef std::shared_ptr<archive_type const>			archive_pointer_type;

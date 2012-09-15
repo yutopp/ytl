@@ -4,6 +4,4 @@
 #include <ytl/config.hpp>
 #include <ytl/assembler.hpp>
 
-#include <ytl/assembler.hpp>
-
 #endif /*YTL_FILEFORMAT_CONFIG_HPP*/
