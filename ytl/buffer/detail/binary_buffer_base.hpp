@@ -1,6 +1,8 @@
 #ifndef YTL_DETAIL_BUFFER_BASE_HPP
 #define YTL_DETAIL_BUFFER_BASE_HPP
 
+#include <cstddef>
+
 #include <type_traits>
 
 #include <ytl/config/typedef.hpp>
@@ -9,32 +11,85 @@ namespace ytl
 {
 	namespace detail
 	{
+		//
+		struct binary_buffer_policy
+		{
+			typedef byte_t							value_type;
+			typedef value_type&						reference;
+			typedef value_type const&				const_reference;
+			typedef value_type*						pointer;
+			typedef value_type const*				const_pointer;
+
+			typedef std::size_t						size_type;
+			typedef std::ptrdiff_t					difference_type;
+		};
+
+
+		//
 		template<
-			template<template<typename Value> class Allocator> class Derived,
-			template<typename Value> class Allocator,
 			template<typename Value, typename Allocator> class ContainerTraits
+		>
+		struct data_member_traits
+		{
+			template<typename T>
+			static auto data( T& container )
+				-> decltype( container.data() )
+			{
+				return container.data();
+			}
+
+			template<typename T>
+			static auto data( T const& container )
+				-> decltype( container.data() )
+			{
+				return container.data();
+			}
+		};
+
+
+		//
+		template<typename Container, typename MemberTraits>
+		struct pointer_type_traits
+		{
+			typedef decltype( MemberTraits::data( *static_cast<Container*>( 0 ) ) )			pointer;
+			typedef decltype( MemberTraits::data( *static_cast<Container const*>( 0 ) ) )	const_pointer;
+		};
+
+
+		//
+		template<typename Unused>
+		struct unused_allocator {};
+
+
+		//
+		template<
+			typename Derived,
+			template<typename Value> class Allocator,
+			template<typename Value, typename Allocator> class ContainerPolicy
 		>
 		class fixed_buffer_base
 		{
 		public:
-			typedef fixed_buffer_base												base_type;
+			typedef fixed_buffer_base													base_type;
 
-			typedef byte_t															value_type;
-			typedef Allocator<value_type>											allocator_type;
+			typedef byte_t																value_type;
+			typedef Allocator<value_type>												allocator_type;
+			typedef typename ContainerPolicy<value_type, allocator_type>::type			wrapped_container_type;
 
 		private:
-			typedef Derived<Allocator>												derived_type;
+			typedef Derived																derived_type;
+			typedef data_member_traits<ContainerPolicy>									data_function_traits;
+			typedef pointer_type_traits<wrapped_container_type, data_function_traits>	data_pointer_type_traits;
 
 		public:
-			typedef typename ContainerTraits<value_type, allocator_type>::type		wrapped_container_type;
+			typedef typename wrapped_container_type::iterator							iterator;
+			typedef typename wrapped_container_type::const_iterator						const_iterator;
+			typedef typename wrapped_container_type::reference							reference;
+			typedef typename wrapped_container_type::difference_type					difference_type;
+			typedef typename wrapped_container_type::size_type							size_type;
 
-			typedef typename wrapped_container_type::iterator						iterator;
-			typedef typename wrapped_container_type::const_iterator					const_iterator;
-			typedef typename wrapped_container_type::reference						reference;
-			typedef typename wrapped_container_type::const_reference				const_reference;
-			typedef typename wrapped_container_type::pointer						pointer;
-			typedef typename wrapped_container_type::difference_type				difference_type;
-			typedef typename wrapped_container_type::size_type						size_type;
+			typedef typename data_pointer_type_traits::pointer							pointer;
+			typedef typename data_pointer_type_traits::const_pointer					const_pointer;
 
 		public:
 			// accessor
@@ -97,6 +152,25 @@ namespace ytl
 
 
 			// Requires
+			inline pointer data()
+			{
+				return data_function_traits::data( *(*this) );
+			}
+
+			inline const_pointer data() const
+			{
+				return data_function_traits::data( *(*this) );
+			}
+
+			inline value_type& at( size_type const index )
+			{
+				return (*this)->at( index );
+			}
+
+			inline value_type const& at( size_type const index ) const
+			{
+				return (*this)->at( index );
+			}
 
 			inline value_type& operator[]( size_type const index )
 			{
@@ -112,7 +186,7 @@ namespace ytl
 
 
 		template<
-			template<template<typename Value> class Allocator> class Derived,
+			typename Derived,
 			template<typename Value> class Allocator,
 			template<typename Value, typename Allocator> class ContainerTraits
 		>
@@ -130,7 +204,7 @@ namespace ytl
 
 			// Requires
 
-			inline void resize()( size_type const size )
+			inline void resize( size_type const size )
 			{
 				(*this)->resize( size );
 			}

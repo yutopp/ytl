@@ -55,6 +55,9 @@
     <Filter Include="buffer\detail">
       <UniqueIdentifier>{92b98cba-4e27-4936-9c62-c49567ebdfbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fileformat\detail">
+      <UniqueIdentifier>{addc6d4f-37d3-4311-b2d1-4f8ed9d1d43b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ytl\assembler\arch.hpp">
@@ -144,9 +147,6 @@
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp">
       <Filter>assembler\arch\x86\operation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\utility\read_binary.hpp">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ytl\utility\dump.hpp">
       <Filter>utility</Filter>
     </ClInclude>
@@ -185,7 +185,6 @@
     <ClInclude Include="..\..\ytl\fileformat\archive\ar.hpp">
       <Filter>fileformat\archive</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ytl\fileformat\detail.hpp" />
     <ClInclude Include="..\..\ytl\buffer\detail\windows_runnable_buffer_allocator.hpp">
       <Filter>buffer\detail</Filter>
     </ClInclude>
@@ -203,6 +202,36 @@
     </ClInclude>
     <ClInclude Include="..\..\ytl\assembler\detail\status_holder.hpp">
       <Filter>assembler\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\detail\valid_buffer_holder.hpp">
+      <Filter>fileformat\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\detail.hpp">
+      <Filter>fileformat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\fileformat\detail\utils.hpp">
+      <Filter>fileformat\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\guard_macros.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\read_binary_file.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\read_binary_file_core.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\mapping_binary_file_core.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\utility\mapping_binary_file.hpp">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\shared_binary_range.hpp">
+      <Filter>buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ytl\buffer\detail\binary_range_traits.hpp">
+      <Filter>buffer\detail</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,11 +7,60 @@
 #include <utility>
 
 #include <ytl/utility.hpp>
+#include <ytl/buffer/binary_buffer.hpp>
+#include <ytl/buffer/file_mapped_binary_buffer.hpp>
 
 namespace ytl
 {
 	namespace fileformat
 	{
+		template<template<typename Buffer> class Object>
+		Object<file_mapped_binary_buffer> mapping( char const* const filename )
+		{
+			typedef Object<file_mapped_binary_buffer>		build_object_type;
+
+			return build_object_type( ytl::mapping_binary_file( filename ) );
+		}
+
+
+		template<template<typename Buffer> class Object, typename Buffer>
+		Object<Buffer> build( char const* const filename )
+		{
+			typedef Object<Buffer>							build_object_type;
+
+			return build_object_type( ytl::read_binary_file<Buffer>( filename ) );
+		}
+
+		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
+		inline Object<Buffer> build( std::basic_string<CharT> const& filename )
+		{
+			return build<Object, Buffer>( filename.c_str() );
+		}
+
+		template<template<typename Buffer> class Object>
+		Object<ytl::binary_buffer<>> build( char const* const filename )
+		{
+			typedef Object<ytl::binary_buffer<>>			build_object_type;
+
+			return build_object_type( ytl::read_binary_file<ytl::binary_buffer<>>( filename ) );
+		}
+
+		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
+		inline Object<ytl::binary_buffer<>> build( std::basic_string<CharT> const& filename )
+		{
+			return build<Object>( filename.c_str() );
+		}
+
+
+		template<template<typename Buffer> class Object, typename Buffer>
+		Object<ytl::binary_buffer<>> build( Buffer&& buffer )
+		{
+			typedef Object<Buffer>							build_object_type;
+
+			return build_object_type( std::forward<Buffer>( buffer ) );
+		}
+
+#if 0
 		namespace detail
 		{
 			struct read_function
@@ -119,6 +168,7 @@ namespace ytl
 			throw std::runtime_error( "Unreach build_object function[ void* ]" );
 		}
 */
+#endif
 
 	} // namespace fileformat
 } // namespace ytl

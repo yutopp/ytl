@@ -15,11 +15,16 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <ytl/buffer/shared_binary_range.hpp>
+#include <ytl/utility/guard_macros.hpp>
+
 #include "../config.hpp"
+#include "../detail/valid_buffer_holder.hpp"
+#include "../detail/utils.hpp"
 
 namespace ytl
 {
@@ -49,27 +54,6 @@ namespace ytl
 
 				std::size_t const sizeof_member_hdr = 60;
 			} // namespace image
-
-			namespace detail
-			{
-				template<typename ReturnT, typename T, std::size_t N>
-				inline ReturnT binary_cast( T const (&bin)[N] )
-				{
-					return binary_cast<ReturnT>( reinterpret_cast<char const*>( bin ), reinterpret_cast<char const*>( bin + N ) );
-				}
-
-				template<typename ReturnT, typename IterT>
-				inline ReturnT binary_cast( IterT const& begin, IterT const& end )
-				{
-					return boost::lexical_cast<ReturnT>(
-									boost::algorithm::replace_all_copy(
-										std::string( begin, end )
-										, " "
-										, ""
-										)
-									);
-				}
-			} // namespace detail
 
 
 			struct managed_member_header
@@ -186,16 +170,12 @@ namespace ytl
 					{
 						char const* it = reinterpret_cast<char const*>( buffer_ + symbols_offset );
 						for( num_type i=0; i<symbol_num; ++i ) {
-							std::string const name( it );
+							std::string name( it );
 							it += name.size() + 1;
-							symbols_.push_back(
-								name
-//								name.at( 0 ) != '/'
-//								? name
-//								: name_table.get_name_by_offset( binary_cast<std::size_t>( name.cbegin() + 1, name.cend() ) )
-								);	
 
-							std::cout << "name : " << name << std::endl;
+							symbols_.emplace_back( std::move( name ) );
+
+							//std::cout << "name : " << name << std::endl;
 						}
 					}
 				}
@@ -278,9 +258,6 @@ namespace ytl
 					return name;
 				}
 
-
-
-
 			private:
 				managed_member_header header_;
 				byte_t const* buffer_;
@@ -289,54 +266,41 @@ namespace ytl
 			};
 
 
-
-
-			template<template <typename T> class Allocator>
-			class basic_accessor
+			//template<typename Buffer>
+			class immutable_accessor
 			{
-				typedef ytl::assembler::basic_binary<Allocator>		binary_type;
-				typedef std::shared_ptr<binary_type>				binary_pointer_type;
-
 			private:
-				class binary_wrapper
+				struct validator
 				{
-				public:
-					binary_wrapper( binary_pointer_type const& p )
-						: p_( p )
+					template<typename T>
+					void operator()( T const& p ) const
 					{
-						validate();
-					}
-
-					binary_type& operator*() { return *p_; }
-					binary_type const& operator*() const { return *p_; }
-					binary_type& operator->() { return *(*this); }
-					binary_type const& operator->() const { return *(*this); }
-
-				private:
-					void validate() const
-					{
-						if ( (*p_)->size() < image::start_size ) {
+						if ( p->size() < image::start_size ) {
 							throw std::runtime_error( "Invalid lib format." );
 						}
 
-						if ( std::memcmp( (*p_)->data(), image::start, image::start_size ) != 0 ) {
+						if ( std::memcmp( p->data(), image::start, image::start_size ) != 0 ) {
 							throw std::runtime_error( "Invalid header." );
 						}
 					}
-
-				private:
-					binary_pointer_type p_;
 				};
 
-			public:
-				typedef	archive<binary_type>						archive_type;
-				typedef std::shared_ptr<archive_type const>			archive_pointer_type;
-				typedef std::size_t									offset_type;
-				typedef std::size_t									index_type;
+			private:
+				typedef detail::immutable_buffer_holder<validator>		holder_type;
+				typedef std::shared_ptr<holder_type const>				holder_shared_pointer;
+
+				typedef const_shared_binary_range<holder_type>			buffer_type;
 
 			public:
-				basic_accessor( binary_pointer_type const& p )
-					: raw_( p )
+				typedef	archive<buffer_type>							archive_type;
+				typedef std::shared_ptr<archive_type>					archive_pointer_type;
+				typedef std::size_t										offset_type, index_type;
+
+			public:
+				// move / copy / unique_ptr
+				template<typename Buffer>
+				immutable_accessor( Buffer&& buffer )
+					: holder_ptr_( std::make_shared<holder_type>( std::forward<Buffer>( buffer ) ) )
 					, first_( get_archive_header_pointer_by_index( 0 ) )
 					, second_( get_archive_header_pointer_by_index( 1 ) )
 					, longnames_( get_archive_header_pointer_by_index( 2 ) )	// may be existed
@@ -345,14 +309,13 @@ namespace ytl
 			public:
 				archive_pointer_type get_archive_by_symbol( std::string const& symbol ) const
 				{
-					auto const offset = second_.get_offset_by_name( symbol );
+					auto const offset = second_.get_offset_by_symbol( symbol );
 					if ( !offset ) {
 						return archive_pointer_type( nullptr );
 					}
 
 					return get_archive_by_offset_with_memoize( *offset );
 				}
-
 
 				archive_pointer_type get_archive_at( std::size_t index ) const
 				{
@@ -378,14 +341,15 @@ namespace ytl
 			private:
 				image::member_header const* get_archive_header_pointer_by_offset( offset_type const offset ) const
 				{
-					if ( offset >= raw_->size() ) {
+					if ( offset >= holder_ptr_->size() ) {
 						throw std::runtime_error( "Out of range." );
 					}
 
 					image::member_header const* const header =
-						reinterpret_cast<image::member_header const* const>( raw_->data() + offset );
+						reinterpret_cast<image::member_header const* const>( holder_ptr_->data() + offset );
 
-					if ( memcmp( header->end_header, image::end, sizeof( header->end_header ) ) != 0 ) {
+
+					if ( std::memcmp( header->end_header, image::end, sizeof( header->end_header ) ) != 0 ) {
 						throw std::runtime_error( "Invalid archive end header." );
 					}
 
@@ -404,7 +368,7 @@ namespace ytl
 				{
 					image::member_header const* const header = get_archive_header_pointer_by_offset( offset );
 
-					auto const begin = raw_->data() + offset + sizeof( image::member_header );
+					auto const begin = holder_ptr_->data() + offset + sizeof( image::member_header );
 					std::size_t const size = get_archive_size_by_offset( offset );
 					archive_type h = {
 						managed_member_header(
@@ -415,16 +379,16 @@ namespace ytl
 									throw std::runtime_error( "Invalid header name." );
 								}
 								return
-									( ( *begin ) != '/' || ( ( *begin ) == '/' && *( begin + 1) == '/' ) )
+									( ( *begin ) != '/' || ( ( *begin ) == '/' && *( begin + 1 ) == '/' ) )
 									? std::string( begin, end )
 									: longnames_.get_name_by_offset( detail::binary_cast<std::size_t>( begin + 1, end ) )
 									;
 							}
 							),
-						binary_type( begin, begin + size )
+						buffer_type( holder_ptr_, begin, begin + size )
 					};
 
-					return std::make_shared<archive_type>( h );
+					return std::make_shared<archive_type>( std::move( h ) );
 				}
 
 				archive_pointer_type get_archive_by_offset_with_memoize( offset_type const offset ) const
@@ -461,7 +425,7 @@ namespace ytl
 				}
 
 			private:
-				binary_wrapper raw_;
+				holder_shared_pointer holder_ptr_;
 
 				first_linker_member first_;
 				second_linker_member second_;
@@ -471,10 +435,10 @@ namespace ytl
 			};
 
 			//
-			typedef basic_accessor<std::allocator> accessor;
+//			typedef basic_accessor<std::allocator> accessor;
 
 
-			// read a binary from a file and build a object
+/*			// read a binary from a file and build a object
 			template<typename F, template <typename> class Allocator>
 			basic_accessor<Allocator> build_object( F const& f, basic_accessor<Allocator>* )
 			{
@@ -482,7 +446,7 @@ namespace ytl
 				f( *p );
 
 				return basic_accessor<Allocator>( p );
-			}
+			}*/
 
 		} // namespace ar
 	} // namespace fileformat

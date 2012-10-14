@@ -3,11 +3,11 @@
 
 #include <ytl/config.hpp>
 
-#if defined(YTL_C_MSVC)
+#if defined( YTL_C_MSVC )
 
 #define YTL_ALIGN( N ) __declspec( align( N ) )
 
-#elif defined(YTL_C_GCC)
+#elif defined( YTL_C_GCC )
 
 #define YTL_ALIGN( N ) __attribute__ ((aligned( N )))
 

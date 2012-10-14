@@ -69,7 +69,7 @@ namespace ytl
 		// ----------------------------------------------------------------------------------------------------
 
 
-		template<template <typename> class T, template <typename> class U>
+/*		template<template <typename> class T, template <typename> class U>
 		inline basic_raw_binary<T>& operator<<( basic_raw_binary<T>& lhs, basic_raw_binary<U> const& rhs )
 		{
 			lhs->insert( lhs->end(), rhs->cbegin(), rhs->cend() );
@@ -88,7 +88,7 @@ namespace ytl
 		{
 			os.write( reinterpret_cast<char const*>( &buffer->data()[0] ), buffer->size() );
 			return os;
-		}
+		}*/
 
 
 		// ----------------------------------------------------------------------------------------------------

@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include <ytl/utility/guard_macros.hpp>
+
 #include "config.hpp"
 #include "detail/buffer_wrapper.hpp"
 
@@ -16,15 +18,12 @@ namespace ytl
 			typedef detail::buffer_wrapper<Buffer>		wrapper_type;
 			typedef EndianWriter						writer_type;
 
-			static_assert(
-				sizeof( typename wrapper_type::value_type ) == 1,
-				__FILE__ " required element of buffer is 1."
-				);
+			YTL_REQUIRE_BINARY_BUFFER( wrapper_type )
 
 		public:
-			typedef typename wrapper_type::index_type				index_type;
-			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
-			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
+			typedef typename wrapper_type::index_type					index_type;
+			typedef typename wrapper_type::index_pointer_type			index_pointer_type;
+			typedef typename wrapper_type::index_const_pointer_type		index_const_pointer_type;
 
 		public:
 			variable_writer( Buffer& b, index_type const index = 0u )
@@ -66,15 +65,12 @@ namespace ytl
 			typedef detail::buffer_wrapper<Buffer>		wrapper_type;
 			typedef EndianWriter						writer_type;
 
-			static_assert(
-				sizeof( typename wrapper_type::value_type ) == 1,
-				__FILE__ " required element of buffer is 1."
-				);
+			YTL_REQUIRE_BINARY_BUFFER( wrapper_type )
 
 		public:
-			typedef typename wrapper_type::index_type				index_type;
-			typedef typename wrapper_type::index_pointer_type		index_pointer_type;
-			typedef typename wrapper_type::index_const_pointer_type	index_const_pointer_type;
+			typedef typename wrapper_type::index_type					index_type;
+			typedef typename wrapper_type::index_pointer_type			index_pointer_type;
+			typedef typename wrapper_type::index_const_pointer_type		index_const_pointer_type;
 
 		public:
 			fixed_writer( Buffer& b, index_type const index = 0u )

@@ -1,10 +1,10 @@
 #include <ytl/config/compiler.hpp>
 
-#if defined(YTL_C_MSVC)
+#if defined( YTL_C_MSVC )
 
 #pragma pack( push, 2 )
 
-#elif defined(YTL_C_GCC)
+#elif defined( YTL_C_GCC )
 
 #pragma pack( 2 )
 

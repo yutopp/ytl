@@ -10,10 +10,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 
-#include <ytl/buffer/binary_buffer.hpp>
+#include <ytl/buffer/shared_buffer_range.hpp>
+#include <ytl/utility/guard_macros.hpp>
 
 #include "../../config.hpp"
-#include "../../detail.hpp"
+#include "../../detail/valid_buffer_holder.hpp"
+#include "../../detail/utils.hpp"
 #include "image.hpp"
 
 namespace ytl
@@ -42,6 +44,7 @@ namespace ytl
 
 
 			// section information
+			template<typename Buffer>
 			class section
 			{
 				typedef std::vector<image::relocation>		relocation_table_type;
@@ -331,14 +334,29 @@ namespace ytl
 
 
 			template<template Buffer>
-			class basic_accessor
+			class immutable_accessor
 			{
+				typedef Buffer													raw_buffer_type;
+
+				YTL_REQUIRE_BINARY_BUFFER( raw_buffer_type )
+
+			private:
+				struct validator
+				{
+					template<typename T>
+					void operator()( T const& p ) const
+					{
+						if ( p_->size() < sizeof( image::file_header ) ) {
+							throw std::runtime_error( "Invalid coff format." );
+						}
+					}
+				};
+
+			private:
+				typedef immutable_buffer_holder<raw_buffer_type, validator>			holder_type;
+				typedef const_shared_buffer_range<holder_type::const_buffer_type>	const_buffer_type;
+
 			public:
-				typedef Buffer										binary_type;
-				typedef typename binary_type::allocator_type		allocator_type;
-
-				typedef std::shared_ptr<binary_type>				binary_pointer_type;
-
 				typedef section										section_type;
 				typedef	section_type const&							const_section_reference;
 				typedef boost::optional<const_section_reference>	optional_const_section_reference;
@@ -348,34 +366,16 @@ namespace ytl
 				typedef boost::optional<const_symbol_reference>		optional_const_symbol_reference;
 
 			private:
-				class binary_wrapper
-				{
-				public:
-					binary_wrapper( binary_pointer_type const& p )
-						: p_( p )
-					{
-						validate();
-					}
-
-					binary_type& operator*() { return *p_; }
-					binary_type const& operator*() const { return *p_; }
-					binary_type& operator->() { return *(*this); }
-					binary_type const& operator->() const { return *(*this); }
-
-				private:
-					void validate() const
-					{
-						// check coff file header size.
-						if ( (*p_)->size() < sizeof( image::file_header ) ) {
-							throw std::runtime_error( "Invalid coff format." );
-						}
-					}
-
-				private:
-					binary_pointer_type p_;
-				};
 
 			public:
+				// move
+				immutable_accessor( raw_buffer_type&& buffer )
+					: holder_( std::move( buffer ) )
+					, first_( get_archive_header_pointer_by_index( 0 ) )
+					, second_( get_archive_header_pointer_by_index( 1 ) )
+					, longnames_( get_archive_header_pointer_by_index( 2 ) )	// may be existed
+				{}
+
 				basic_accessor( binary_pointer_type const& p )
 					: raw_( p )
 					, header_( reinterpret_cast<image::file_header const*>( raw_->data() ) )
@@ -445,7 +445,7 @@ namespace ytl
 			};
 
 
-			typedef basic_accessor<binary_buffer<std::allocator>> accessor;
+//			typedef basic_accessor<binary_buffer<std::allocator>> accessor;
 
 
 			template<typename F, template <typename> class Allocator>

@@ -22,7 +22,7 @@ namespace ytl
 	template<template <typename> class Allocator = std::allocator>
 	class binary_buffer
 		: public detail::resizable_buffer_base<
-					binary_buffer, Allocator,
+					binary_buffer<Allocator>, Allocator,
 					detail::binary_buffer_container
 				>
 	{
@@ -39,11 +39,9 @@ namespace ytl
 		binary_buffer()
 		{}
 
-		binary_buffer( size_type const size )
+/*		binary_buffer( size_type const size )
 			: buffer_( size )
-		{
-//			std::cout << "basic_binary: size ctor." << std::endl;
-		}
+		{}*/
 
 		template<typename IterT>
 		binary_buffer( IterT const& begin, IterT const& end )

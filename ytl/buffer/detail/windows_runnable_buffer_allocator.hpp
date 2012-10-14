@@ -18,13 +18,13 @@ namespace ytl
 			class runnable_buffer_allocator
 			{
 			public:
-				typedef std::size_t size_type;
-				typedef std::ptrdiff_t difference_type;
-				typedef T* pointer;
-				typedef T const* const_pointer;
-				typedef T& reference;
-				typedef T const& const_reference;
-				typedef T value_type;
+				typedef std::size_t				size_type;
+				typedef std::ptrdiff_t			difference_type;
+				typedef T*						pointer;
+				typedef T const*				const_pointer;
+				typedef T&						reference;
+				typedef T const&				const_reference;
+				typedef T						value_type;
 
 				template<typename U>
 				struct rebind
