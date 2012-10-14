@@ -6,13 +6,13 @@
 namespace ytl
 {
 	template<typename CharT>
-	file_mapped_binary_buffer mapping_binary_file( CharT const* const filename )
+	file_mapped_binary_buffer mapping( CharT const* const filename )
 	{
 		return file_mapped_binary_buffer( filename );
 	}
 
 	template<typename Buffer, typename CharT>
-	inline file_mapped_binary_buffer mapping_binary_file( std::basic_string<CharT> const& filename )
+	inline file_mapped_binary_buffer mapping( std::basic_string<CharT> const& filename )
 	{
 		return file_mapped_binary_buffer( filename.c_str() );
 	}

@@ -14,46 +14,44 @@ namespace ytl
 {
 	namespace fileformat
 	{
-		template<template<typename Buffer> class Object>
-		Object<file_mapped_binary_buffer> mapping( char const* const filename )
+		template<typename Object>
+		Object mapping_object( char const* const filename )
 		{
-			typedef Object<file_mapped_binary_buffer>		build_object_type;
+			typedef typename std::remove_reference<Object>::type	build_object_type;
 
-			return build_object_type( ytl::mapping_binary_file( filename ) );
+			return build_object_type( ytl::mapping( filename ) );
 		}
 
 
-		template<template<typename Buffer> class Object, typename Buffer>
-		Object<Buffer> build( char const* const filename )
+		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
+		Object<Buffer> build_object( CharT const* const filename )
 		{
 			typedef Object<Buffer>							build_object_type;
 
-			return build_object_type( ytl::read_binary_file<Buffer>( filename ) );
+			return build_object_type( ytl::read<Buffer>( filename ) );
 		}
 
 		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
-		inline Object<Buffer> build( std::basic_string<CharT> const& filename )
+		inline Object<Buffer> build_object( std::basic_string<CharT> const& filename )
 		{
-			return build<Object, Buffer>( filename.c_str() );
+			return build_object<Object, Buffer>( filename.c_str() );
 		}
 
-		template<template<typename Buffer> class Object>
-		Object<ytl::binary_buffer<>> build( char const* const filename )
+		template<template<typename Buffer> class Object, typename CharT>
+		Object<ytl::binary_buffer<>> build_object( CharT const* const filename )
 		{
-			typedef Object<ytl::binary_buffer<>>			build_object_type;
-
-			return build_object_type( ytl::read_binary_file<ytl::binary_buffer<>>( filename ) );
+			return build_object<Object, ytl::binary_buffer<>>( filename );
 		}
 
 		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
-		inline Object<ytl::binary_buffer<>> build( std::basic_string<CharT> const& filename )
+		inline Object<ytl::binary_buffer<>> build_object( std::basic_string<CharT> const& filename )
 		{
-			return build<Object>( filename.c_str() );
+			return build_object<Object>( filename.c_str() );
 		}
 
 
 		template<template<typename Buffer> class Object, typename Buffer>
-		Object<ytl::binary_buffer<>> build( Buffer&& buffer )
+		Object<Buffer> build_object( Buffer&& buffer )
 		{
 			typedef Object<Buffer>							build_object_type;
 

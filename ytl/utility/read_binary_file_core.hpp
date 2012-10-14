@@ -14,7 +14,7 @@
 namespace ytl
 {
 	template<typename Buffer, typename CharT>
-	void read_binary_file( CharT const* const filename, Buffer& dst )
+	void read( CharT const* const filename, Buffer& dst )
 	{
 		YTL_REQUIRE_BINARY_BUFFER( Buffer )
 
@@ -29,14 +29,14 @@ namespace ytl
 	}
 
 	template<typename Buffer, typename CharT>
-	inline void read_binary_file( std::basic_string<CharT> const& filename, Buffer& dst )
+	inline void read( std::basic_string<CharT> const& filename, Buffer& dst )
 	{
-		read_binary_file( filename.c_str(), dst );
+		read( filename.c_str(), dst );
 	}
 
 
 	template<typename Buffer, typename CharT>
-	Buffer read_binary_file( CharT const* const filename )
+	Buffer read( CharT const* const filename )
 	{
 		Buffer buf;
 		read_binary_file( filename, buf );
@@ -45,9 +45,9 @@ namespace ytl
 	}
 
 	template<typename Buffer, typename CharT>
-	inline Buffer read_binary_file( std::basic_string<CharT> const& filename )
+	inline Buffer read( std::basic_string<CharT> const& filename )
 	{
-		return read_binary_file<Buffer>( filename.c_str() );
+		return read<Buffer>( filename.c_str() );
 	}
 
 } // namespace ytl

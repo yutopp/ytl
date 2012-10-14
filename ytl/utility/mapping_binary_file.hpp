@@ -9,20 +9,20 @@ namespace ytl
 {
 	// shared_type
 	template<typename CharT>
-	std::shared_ptr<file_mapped_binary_buffer> mapping_shared_binary_file( CharT const* const filename )
+	std::shared_ptr<file_mapped_binary_buffer> mapping_shared( CharT const* const filename )
 	{
 		return std::make_shared<file_mapped_binary_buffer>( filename );
 	}
 
 	template<typename CharT>
-	inline std::shared_ptr<file_mapped_binary_buffer> mapping_shared_binary_file( std::basic_string<CharT> const& filename )
+	inline std::shared_ptr<file_mapped_binary_buffer> mapping_shared( std::basic_string<CharT> const& filename )
 	{
-		return mapping_shared_binary_file( filename.c_str() );
+		return mapping_shared( filename.c_str() );
 	}
 
 	// unique_type
 	template<typename CharT>
-	std::unique_ptr<file_mapped_binary_buffer> mapping_unique_binary_file( CharT const* const filename )
+	std::unique_ptr<file_mapped_binary_buffer> mapping_unique( CharT const* const filename )
 	{
 		std::unique_ptr<file_mapped_binary_buffer> p( new file_mapped_binary_buffer( filename ) );
 
@@ -30,9 +30,9 @@ namespace ytl
 	}
 
 	template<typename CharT>
-	inline std::unique_ptr<file_mapped_binary_buffer> mapping_unique_binary_file( std::basic_string<CharT> const& filename )
+	inline std::unique_ptr<file_mapped_binary_buffer> mapping_unique( std::basic_string<CharT> const& filename )
 	{
-		return mapping_unique_binary_file( filename.c_str() );
+		return mapping_unique( filename.c_str() );
 	}
 
 } // namespace ytl
