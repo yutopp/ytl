@@ -11,7 +11,7 @@ namespace ytl
 		return file_mapped_binary_buffer( filename );
 	}
 
-	template<typename Buffer, typename CharT>
+	template<typename CharT>
 	inline file_mapped_binary_buffer mapping( std::basic_string<CharT> const& filename )
 	{
 		return file_mapped_binary_buffer( filename.c_str() );

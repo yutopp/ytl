@@ -27,7 +27,7 @@ namespace ytl
 
 		//
 		template<
-			template<typename Value, typename Allocator> class ContainerTraits
+			template<typename Value, template<typename> class Allocator> class ContainerTraits
 		>
 		struct data_member_traits
 		{
@@ -48,6 +48,21 @@ namespace ytl
 
 
 		//
+		template<typename Container>
+		struct container_copy_traits
+		{
+			typedef Container			container_type;
+
+			template<typename Iter>
+			static Container copy( Container const&, Iter const& begin, Iter const& end )
+			{
+				return Container( begin, end );
+			}
+		};
+
+
+
+		//
 		template<typename Container, typename MemberTraits>
 		struct pointer_type_traits
 		{
@@ -61,23 +76,23 @@ namespace ytl
 		struct unused_allocator {};
 
 
-		//
+		//		
 		template<
 			typename Derived,
 			template<typename Value> class Allocator,
-			template<typename Value, typename Allocator> class ContainerPolicy
+			template<typename Value, template<typename> class Allocator> class ContainerPolicy
 		>
 		class fixed_buffer_base
 		{
 		public:
 			typedef fixed_buffer_base													base_type;
+			typedef Derived																derived_type;
 
 			typedef byte_t																value_type;
+			typedef typename ContainerPolicy<value_type, Allocator>::type				wrapped_container_type;
 			typedef Allocator<value_type>												allocator_type;
-			typedef typename ContainerPolicy<value_type, allocator_type>::type			wrapped_container_type;
-
+			
 		private:
-			typedef Derived																derived_type;
 			typedef data_member_traits<ContainerPolicy>									data_function_traits;
 			typedef pointer_type_traits<wrapped_container_type, data_function_traits>	data_pointer_type_traits;
 
@@ -188,22 +203,18 @@ namespace ytl
 		template<
 			typename Derived,
 			template<typename Value> class Allocator,
-			template<typename Value, typename Allocator> class ContainerTraits
+			template<typename Value, template<typename> class Allocator> class ContainerPolicy
 		>
 		class resizable_buffer_base
-			: public fixed_buffer_base<Derived, Allocator, ContainerTraits>
+			: public fixed_buffer_base<Derived, Allocator, ContainerPolicy>
 		{
 		public:
 			typedef resizable_buffer_base							self_type;
-			typedef typename self_type::base_type					base_type;
 
-			typedef typename base_type::value_type					value_type;
-			typedef typename base_type::size_type					size_type;
+			typedef typename self_type::value_type					value_type;
+			typedef typename self_type::size_type					size_type;
 
 		public:
-
-			// Requires
-
 			inline void resize( size_type const size )
 			{
 				(*this)->resize( size );
@@ -214,6 +225,65 @@ namespace ytl
 				(*this)->push_back( value );
 			}
 		};
+
+
+		// ----------------------------------------------------------------------------------------------------
+		template<
+			typename LhsDerived,
+			template<typename Value> class LhsAllocator,
+			template<typename Value, template<typename> class Allocator> class LhsContainerPolicy,
+			typename RhsDerived,
+			template<typename Value> class RhsAllocator,
+			template<typename Value, template<typename> class Allocator> class RhsContainerPolicy
+		>
+		inline typename fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>::derived_type&
+			operator<<(
+				fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>& lhs,
+				fixed_buffer_base<RhsDerived, RhsAllocator, RhsContainerPolicy> const& rhs
+				)
+		{
+			lhs->insert( lhs->end(), rhs->begin(), rhs->end() );
+
+			return static_cast<
+						typename fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>::derived_type&
+					>( lhs );
+		}
+
+		template<
+			typename LhsDerived,
+			template<typename Value> class LhsAllocator,
+			template<typename Value, template<typename> class Allocator> class LhsContainerPolicy,
+			std::size_t N
+		>
+		inline typename fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>::derived_type&
+			operator<<(
+				fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>& lhs,
+				typename fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>::value_type const (&rhs)[N]
+				)
+		{
+			lhs->insert( lhs->end(), rhs, rhs + N );
+
+			return static_cast<
+						typename fixed_buffer_base<LhsDerived, LhsAllocator, LhsContainerPolicy>::derived_type&
+					>( lhs );
+		}
+
+		template<
+			typename Derived,
+			template<typename Value> class Allocator,
+			template<typename Value, template<typename> class Allocator> class ContainerPolicy,
+			std::size_t N
+		>
+		inline std::ostream& operator<<(
+			std::ostream& os,
+			fixed_buffer_base<Derived, Allocator, ContainerPolicy> const& buffer
+			)
+		{
+			os.write( reinterpret_cast<char const*>( &buffer->data()[0] ), buffer->size() );
+
+			return os;
+		}
+		// ----------------------------------------------------------------------------------------------------
 
 	} // namespace detail
 } // namespace ytl

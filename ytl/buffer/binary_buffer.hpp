@@ -9,10 +9,10 @@ namespace ytl
 {
 	namespace detail
 	{
-		template<typename Value, typename Allocator>
+		template<typename Value, template<typename> class Allocator>
 		struct binary_buffer_container
 		{
-			typedef std::vector<Value, Allocator>		type;
+			typedef std::vector<Value, Allocator<Value>>		type;
 		};
 
 	} // namespace detail
@@ -43,12 +43,13 @@ namespace ytl
 			: buffer_( size )
 		{}*/
 
-		template<typename IterT>
+/*		template<typename IterT>
 		binary_buffer( IterT const& begin, IterT const& end )
 			: buffer_( begin, end )
 		{
 //			std::cout << "basic_binary: iter ctor." << std::endl;
-		}
+		}*/
+
 
 		wrapped_container_type& get()
 		{
@@ -70,10 +71,10 @@ namespace ytl
 
 		void align( size_type alignment, value_type v = 0 )
 		{
-			size_type const rest = binary_.size() % alignment;
+			size_type const rest = buffer_.size() % alignment;
 
 			for( size_type i=0; i<rest; ++i ) {
-				binary_.emplace_back( v );
+				buffer_.emplace_back( v );
 			}
 		}
 

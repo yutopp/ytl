@@ -195,7 +195,7 @@ namespace ytl
 					sym_undefined		= (short_t)0,			// Symbol is undefined or is common.
 					sym_absolute		= (short_t)-1,			// Symbol is an absolute value.
 					sym_debug			= (short_t)-2,			// Symbol is a special debug item.
-					sym_sectoin_max		= 0xFEFF,				// Values 0xFF00-0xFFFF are special
+					sym_sectoin_max		= (short_t)0xfeff				// Values 0xFF00-0xFFFF are special
 				};
 
 #include <ytl/detail/packed_2_begin.hpp>

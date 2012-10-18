@@ -19,13 +19,13 @@ namespace ytl
 					file_mapped_binary_buffer, detail::unused_allocator,
 					detail::binary_range_container
 				>
-		, private boost::noncopyable
+//		, private boost::noncopyable
 	{
 	public:
 		typedef file_mapped_binary_buffer				self_type;
 		typedef self_type::base_type					base_type;
 
-		typedef base_type::wrapped_container_type		wrapped_container_type;
+		typedef self_type::wrapped_container_type		wrapped_container_type;
 
 	public:
 		file_mapped_binary_buffer( char const* file_path, boost::interprocess::mode_t mode = boost::interprocess::read_only )

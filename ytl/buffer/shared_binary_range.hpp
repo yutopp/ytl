@@ -8,11 +8,34 @@
 
 namespace ytl
 {
-	// Require: Random Access
+	template<typename Owner>
+	class const_shared_binary_range;
+
+	namespace detail
+	{
+		template<typename Owner>
+		struct container_copy_traits<const_shared_binary_range<Owner>>
+		{
+			typedef Owner									owner_type;
+			typedef std::shared_ptr<owner_type const>		owner_shared_pointer;
+
+			typedef const_shared_binary_range<Owner>		container_type;
+
+		public:
+			template<typename Iter>
+			static container_type copy( owner_shared_pointer const& owner, Iter const& begin, Iter const& end )
+			{
+				return container_type( owner, begin, end );
+			}
+		};
+
+	} // namespace detail
+
+
 	template<typename Owner>
 	class const_shared_binary_range
 		: public detail::fixed_buffer_base<
-					file_mapped_binary_buffer, detail::unused_allocator,
+					const_shared_binary_range<Owner>, detail::unused_allocator,
 					detail::const_binary_range_container
 				>
 	{
@@ -27,6 +50,8 @@ namespace ytl
 		typedef std::shared_ptr<owner_type const>					owner_shared_pointer;
 
 	public:
+		const_shared_binary_range() {}
+
 		const_shared_binary_range( owner_shared_pointer ptr, const_pointer begin, const_pointer end )
 			: ptr_( ptr )
 			, rng_( begin, end )
@@ -36,6 +61,11 @@ namespace ytl
 			: ptr_( ptr )
 			, rng_( rng )
 		{}
+
+/*		const_shared_binary_range( const_shared_binary_range&& rhs )
+			: ptr_( std::move( rhs.ptr_ ) )
+			, rng_( std::move( rhs.rng_ ) )
+		{}*/
 
 		range_type& get()
 		{
@@ -59,6 +89,7 @@ namespace ytl
 		owner_shared_pointer ptr_;
 		range_type rng_;
 	};
-}
+
+} // namespace ytl
 
 #endif /*YTL_SHARED_BINARY_RANGE_HPP*/

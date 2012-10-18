@@ -22,17 +22,21 @@ namespace ytl
 			template<typename Derived, typename Writer>
 			class pseudo_operations
 			{
-				typedef Derived							derived_type;
+				typedef Derived										derived_type;
 
 			public:
-				typedef Writer							writer_type;
-				typedef std::shared_ptr<writer_type>	writer_pointer_type;
+				typedef Writer										writer_type;
+				typedef std::shared_ptr<writer_type>				writer_shared_pointer;
 
-				typedef std::size_t						size_type;
-				typedef derived_type					return_type;
+				typedef detail::status_holder						status_type;
+				typedef detail::status_holder_shared_ptr			status_shared_pointer;
+				typedef detail::const_status_holder_shared_ptr		const_status_shared_pointer;
+
+				typedef std::size_t									size_type;
+				typedef derived_type								return_type;
 
 			public:
-				pseudo_operations( writer_pointer_type w, detail::status_holder_ptr s )
+				pseudo_operations( writer_shared_pointer w, status_shared_pointer s )
 					: writer_( w )
 					, status_( s )
 				{}
@@ -101,8 +105,8 @@ namespace ytl
 				YTL_ASM_OP_END
 
 			private:
-				writer_pointer_type writer_;
-				detail::status_holder_ptr status_;
+				writer_shared_pointer writer_;
+				status_shared_pointer status_;
 			};
 
 		} // namespace detail

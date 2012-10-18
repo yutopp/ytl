@@ -15,15 +15,31 @@ namespace ytl
 	namespace fileformat
 	{
 		template<typename Object>
-		Object mapping_object( char const* const filename )
+		typename std::remove_reference<Object>::type
+			mapping_object( char const* const filename )
 		{
 			typedef typename std::remove_reference<Object>::type	build_object_type;
 
 			return build_object_type( ytl::mapping( filename ) );
 		}
 
+		template<typename Object>
+		inline typename std::remove_reference<Object>::type
+			mapping_object( std::string const& filename )
+		{
+			return mapping_object<Object>( filename.c_str() );
+		}
 
-		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
+		template<typename Object, typename Binary>
+		typename std::remove_reference<Object>::type
+			build_object( Binary&& binary )
+		{
+			typedef typename std::remove_reference<Object>::type	build_object_type;
+
+			return build_object_type( std::forward<Binary>( binary ) );
+		}
+
+/*		template<template<typename Buffer> class Object, typename Buffer, typename CharT>
 		Object<Buffer> build_object( CharT const* const filename )
 		{
 			typedef Object<Buffer>							build_object_type;
@@ -56,7 +72,7 @@ namespace ytl
 			typedef Object<Buffer>							build_object_type;
 
 			return build_object_type( std::forward<Buffer>( buffer ) );
-		}
+		}*/
 
 #if 0
 		namespace detail

@@ -47,13 +47,13 @@ namespace ytl
 				class default_code_genarator
 				{
 				public:
-					ytl::assembler::binary operator()() const
+					ytl::assembler::binary_code operator()() const
 					{
 						namespace x86 = ytl::assembler::x86;
 						namespace reg = x86::registers;
 
 						ytl::assembler::generator<x86::engine> as;
-						ytl::assembler::binary bin;
+						ytl::assembler::binary_code bin;
 						
 						// create DOS stub code
 						as( bin )
@@ -114,14 +114,14 @@ namespace ytl
 						return code_gen_type()()->size();
 					}
 
-					ytl::assembler::binary operator()() const
+					ytl::assembler::binary_code operator()() const
 					{
 						namespace x86 = ytl::assembler::x86;
 
 						ytl::assembler::generator<x86::engine> as;
 						auto const& body = code_gen_type()();
 	
-						ytl::assembler::binary binary;
+						ytl::assembler::binary_code binary;
 
 						as( binary )
 							.embed		( header_gen_type()( pe_start_ ) )		// generate dos header

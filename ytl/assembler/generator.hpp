@@ -13,7 +13,7 @@
 #include "config.hpp"
 #include "writer.hpp"
 #include "endian_writer.hpp"
-#include "binary.hpp"
+#include "binary_code.hpp"
 
 namespace ytl
 {
@@ -44,36 +44,18 @@ namespace ytl
 			template<typename Buffer>
 			Engine<typename suitable_writer<Buffer, endian_writer_type>::type> // engine_type
 			operator()( Buffer& buffer,
-						index_type const index = 0u,
-						typename std::enable_if<!ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
+						index_type const index = 0u
+						)
 			{
 				typedef typename suitable_writer<Buffer, endian_writer_type>::type		writer_type;
 				typedef Engine<writer_type>												engine_type;
+				typedef detail::get_asm_status_traits<Buffer>							buffer_asm_status_traits;
 
 				auto const writer( std::make_shared<writer_type>( buffer, index ) );
-				std::shared_ptr<detail::asm_status> const status( new detail::asm_status );
 
 				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
 				
-				return engine_type( writer, status /*std::make_shared<detail::asm_status>()*/ );
-			}
-
-			template<typename Buffer>
-			Engine<typename suitable_writer<typename Buffer::wrapped_container_type, endian_writer_type>::type> // engine_type
-			operator()( Buffer& buffer,
-						index_type const index = 0u,
-						typename std::enable_if<ytl::has_wrapped_container_type<Buffer>::value>::type* =0 )
-			{
-				typedef typename Buffer::wrapped_container_type								buffer_type;
-
-				typedef typename suitable_writer<buffer_type, endian_writer_type>::type		writer_type;
-				typedef Engine<writer_type>													engine_type;
-
-				auto const writer( std::make_shared<writer_type>( buffer.get(), index ) );
-
-				index_wrapper_ = index_wrapper( writer->get_index_ptr() );
-
-				return engine_type( writer, buffer.get_status() );
+				return engine_type( writer, buffer_asm_status_traits::get( buffer ) );
 			}
 
 		private:

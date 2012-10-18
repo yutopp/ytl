@@ -12,13 +12,13 @@ namespace ytl
 {
 	namespace detail
 	{
-		template<typename Value, typename Unused_Allocator>
+		template<typename Value, template<typename> class Unused_Allocator>
 		struct binary_range_container
 		{
 			typedef boost::iterator_range<Value*>			type;
 		};
 
-		template<typename Value, typename Unused_Allocator>
+		template<typename Value, template<typename> class Unused_Allocator>
 		struct const_binary_range_container
 		{
 			typedef boost::iterator_range<Value const*>		type;
@@ -36,7 +36,7 @@ namespace ytl
 
 			template<typename T>
 			static auto data( T const& rng )
-				-> std::add_pointer<
+				-> typename std::add_pointer<
 						typename std::add_const<
 							typename std::remove_pointer<decltype( rng.begin() )>::type
 						>::type
@@ -58,7 +58,7 @@ namespace ytl
 
 			template<typename T>
 			static auto data( T const& rng )
-				-> std::add_pointer<
+				-> typename std::add_pointer<
 						typename std::add_const<
 							typename std::remove_pointer<decltype( rng.begin() )>::type
 						>::type

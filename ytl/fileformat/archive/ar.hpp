@@ -16,11 +16,8 @@
 #include <iostream>
 
 #include <boost/optional.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include <ytl/buffer/shared_binary_range.hpp>
-#include <ytl/utility/guard_macros.hpp>
 
 #include "../config.hpp"
 #include "../detail/valid_buffer_holder.hpp"
@@ -55,31 +52,40 @@ namespace ytl
 				std::size_t const sizeof_member_hdr = 60;
 			} // namespace image
 
-
-			struct managed_member_header
+			namespace detail
 			{
-				explicit managed_member_header( image::member_header const* p )
-					: name( reinterpret_cast<char const*>( p->name ), reinterpret_cast<char const*>( p->name ) + sizeof( p->name ) )
-					, date( detail::binary_cast<std::time_t>( p->date ) )
-					, size( detail::binary_cast<std::size_t>( p->size ) )
+				using namespace ytl::fileformat::detail;
+
+			} // namespace detail
+
+
+			// -------------------------------------------------------------------------------- //
+			// member_header
+			// -------------------------------------------------------------------------------- //
+			namespace op
+			{
+				template<std::size_t N, typename NameTable>
+				std::string build_name( byte_t const(&str)[N], NameTable const& table )
 				{
-//					std::memcpy( user_id, p->user_id, sizeof( user_id ) );
-//					std::memcpy( group_id, p->group_id, sizeof( group_id ) );
-//					std::memcpy( mode, p->mode, sizeof( mode ) );
+					static_assert( sizeof( image::member_header().name ) == N, "expected image::member_header::name." );
+
+					char const* begin = reinterpret_cast<char const*>( str );
+					char const* end = begin + N;
+
+					if ( str[0] != '/' || ( str[0] == '/' && str[1] == '/' ) ) {
+						auto const& s = detail::shrink_space( begin, end );
+						return std::string( s.begin(), s.end() - ( s.back() == '/' ? 1 : 0 ) );
+
+					} else {
+						return table.get_name_by_offset( detail::binary_cast<std::size_t>( begin + 1, end ) );
+					}
 				}
 
-				template<typename F>
-				managed_member_header( image::member_header const* p, F&& f )
-					: name( f( reinterpret_cast<char const*>( p->name ), reinterpret_cast<char const*>( p->name ) + sizeof( p->name ) ) )
-					, date( detail::binary_cast<std::time_t>( p->date ) )
-					, size( detail::binary_cast<std::size_t>( p->size ) )
-				{
-//					std::memcpy( user_id, p->user_id, sizeof( user_id ) );
-//					std::memcpy( group_id, p->group_id, sizeof( group_id ) );
-//					std::memcpy( mode, p->mode, sizeof( mode ) );
-				}
+			} // namespace op
 
-			public:
+			//
+			struct member_header
+			{
 				std::string name;
 				std::time_t date;
 //				byte_t user_id[6];
@@ -88,15 +94,40 @@ namespace ytl
 				std::size_t size;
 			};
 
+			namespace detail
+			{
+				template<typename NameTable>
+				member_header parse_member_header( image::member_header const* p, NameTable const& table )
+				{
+					member_header m = {
+						op::build_name( p->name, table ),
+						detail::binary_cast<std::time_t>( p->date ),
+						detail::binary_cast<std::size_t>( p->size )
+					};
 
+					return m;
+				}
+
+			} // namespace detail
+			// ----- end : member_header ------------------------------------------------------ //
+			// -------------------------------------------------------------------------------- //
+
+
+			// -------------------------------------------------------------------------------- //
+			// archive
+			// -------------------------------------------------------------------------------- //
 			template<typename Buffer>
 			struct archive
 			{
-				managed_member_header header;
+				member_header header;
 				Buffer body;
 			};
+			// ---- end : archive ------------------------------------------------------------- //
+			// -------------------------------------------------------------------------------- //
 
 
+
+			// Relic structue
 			class first_linker_member
 			{
 			public:
@@ -115,6 +146,8 @@ namespace ytl
 			};
 
 
+
+			//
 			class second_linker_member
 			{
 				typedef uint32_t					num_type;
@@ -226,6 +259,8 @@ namespace ytl
 			};
 
 
+
+			//
 			class longnames
 			{
 				typedef uint32_t		offset_type;
@@ -233,22 +268,19 @@ namespace ytl
 
 			public:
 				explicit longnames( image::member_header const* const raw_header )
-					: header_( raw_header )
+					: size_(
+						( std::memcmp( raw_header->name, image::longnames_member, sizeof( raw_header->name ) ) == 0 ) // check sigunature
+						? detail::binary_cast<std::size_t>( raw_header->size )
+						: -1
+					)
 					, buffer_( reinterpret_cast<byte_t const*>( raw_header ) + sizeof( image::member_header ) )
 				{
-					// check sigunature
-					if ( std::memcmp( raw_header->name, image::longnames_member, sizeof( raw_header->name ) ) != 0 ) {
-						//throw std::exception( "This is not a longnames member." );
-						header_.size = -1;
-						return;		// this header may be optional.
-					}
-
 //					std::cout << "Lib longnames_: " << raw_header->name << std::endl;
 				}
 
 				std::string get_name_by_offset( offset_type const offset ) const
 				{
-					if ( offset < 0 || offset >= header_.size ) {
+					if ( offset < 0 || offset >= size_ ) {
 						throw std::runtime_error( "Out of range." );
 					}
 
@@ -259,42 +291,49 @@ namespace ytl
 				}
 
 			private:
-				managed_member_header header_;
+				std::size_t size_;
 				byte_t const* buffer_;
 
 //				mutable std::map<offset_type, string_type> names_;
 			};
 
 
-			//template<typename Buffer>
-			class immutable_accessor
+
+
+			namespace op
 			{
-			private:
 				struct validator
 				{
 					template<typename T>
-					void operator()( T const& p ) const
+					void operator()( T const& buffer ) const
 					{
-						if ( p->size() < image::start_size ) {
+						if ( buffer.size() < image::start_size ) {
 							throw std::runtime_error( "Invalid lib format." );
 						}
 
-						if ( std::memcmp( p->data(), image::start, image::start_size ) != 0 ) {
+						if ( std::memcmp( buffer.data(), image::start, image::start_size ) != 0 ) {
 							throw std::runtime_error( "Invalid header." );
 						}
 					}
 				};
+			} // namespace op
 
+
+			//template<typename Buffer>
+			class immutable_accessor
+			{
 			private:
-				typedef detail::immutable_buffer_holder<validator>		holder_type;
-				typedef std::shared_ptr<holder_type const>				holder_shared_pointer;
+				typedef detail::immutable_valid_buffer_holder<op::validator>	holder_type;
+				typedef holder_type const										const_holder_type;
+				typedef std::shared_ptr<const_holder_type>						holder_shared_pointer;
 
-				typedef const_shared_binary_range<holder_type>			buffer_type;
+				typedef const_shared_binary_range<const_holder_type>			buffer_type;
+				typedef ytl::detail::container_copy_traits<buffer_type>			copy_traits;
 
 			public:
-				typedef	archive<buffer_type>							archive_type;
-				typedef std::shared_ptr<archive_type>					archive_pointer_type;
-				typedef std::size_t										offset_type, index_type;
+				typedef	archive<buffer_type>									archive_type;
+				typedef std::shared_ptr<archive_type>							archive_pointer_type;
+				typedef std::size_t												offset_type, index_type;
 
 			public:
 				// move / copy / unique_ptr
@@ -371,21 +410,8 @@ namespace ytl
 					auto const begin = holder_ptr_->data() + offset + sizeof( image::member_header );
 					std::size_t const size = get_archive_size_by_offset( offset );
 					archive_type h = {
-						managed_member_header(
-							header,
-							[this]( char const* begin, char const* end )
-							{
-								if ( end - begin < 8  ) {	// neet at least 8bytes offset.
-									throw std::runtime_error( "Invalid header name." );
-								}
-								return
-									( ( *begin ) != '/' || ( ( *begin ) == '/' && *( begin + 1 ) == '/' ) )
-									? std::string( begin, end )
-									: longnames_.get_name_by_offset( detail::binary_cast<std::size_t>( begin + 1, end ) )
-									;
-							}
-							),
-						buffer_type( holder_ptr_, begin, begin + size )
+						detail::parse_member_header( header, longnames_ ),
+						copy_traits::copy( holder_ptr_, begin, begin + size )
 					};
 
 					return std::make_shared<archive_type>( std::move( h ) );
@@ -433,20 +459,6 @@ namespace ytl
 
 				mutable std::unordered_map<offset_type, archive_pointer_type> memo_;
 			};
-
-			//
-//			typedef basic_accessor<std::allocator> accessor;
-
-
-/*			// read a binary from a file and build a object
-			template<typename F, template <typename> class Allocator>
-			basic_accessor<Allocator> build_object( F const& f, basic_accessor<Allocator>* )
-			{
-				auto p = std::make_shared<ytl::assembler::basic_binary<Allocator>>();
-				f( *p );
-
-				return basic_accessor<Allocator>( p );
-			}*/
 
 		} // namespace ar
 	} // namespace fileformat

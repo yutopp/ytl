@@ -7,15 +7,14 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/optional.hpp>
 
-#include <ytl/buffer/shared_buffer_range.hpp>
-#include <ytl/utility/guard_macros.hpp>
+#include <ytl/buffer/shared_binary_range.hpp>
 
 #include "../../config.hpp"
 #include "../../detail/valid_buffer_holder.hpp"
 #include "../../detail/utils.hpp"
+
 #include "image.hpp"
 
 namespace ytl
@@ -24,6 +23,52 @@ namespace ytl
 	{
 		namespace coff
 		{
+			namespace detail
+			{
+				using namespace ytl::fileformat::detail;
+
+
+			} // namespace detail
+
+
+			namespace op
+			{
+				struct validator
+				{
+					template<typename T>
+					void operator()( T const& buffer ) const
+					{
+						if ( buffer.size() < sizeof( image::file_header ) ) {
+							throw std::runtime_error( "Invalid coff format." );
+						}
+					}
+				};
+
+				inline image::section_header const*
+					section_header_begin_pointer( image::file_header const* const header )
+				{
+					return reinterpret_cast<image::section_header const*>( header + 1 );
+				}
+
+				inline image::symbol const*
+					symbol_begin_pointer( image::file_header const* const header, byte_t const* const data )
+				{
+					return reinterpret_cast<image::symbol const*>( data + header->pointer_to_symbol_table );
+				}
+
+				inline byte_t const*
+					long_symbol_table_begin_pointer( image::file_header const* const header, byte_t const* const data )
+				{
+					return reinterpret_cast<byte_t const*>( symbol_begin_pointer( header, data ) + header->number_of_symbols );
+				}
+
+			} // namespace op
+
+
+
+
+
+			//
 			class long_symbol_table
 			{
 				typedef std::size_t		offset_type;
@@ -47,12 +92,19 @@ namespace ytl
 			template<typename Buffer>
 			class section
 			{
-				typedef std::vector<image::relocation>		relocation_table_type;
+			public:
+				typedef Buffer												buffer_type;
+
+			private:
+				typedef std::vector<image::relocation>						relocation_table_type;
+				typedef ytl::detail::container_copy_traits<buffer_type>		copy_traits;
 
 			public:
+				template<typename Holder>
 				section(
 					image::section_header const* const header,
-					byte_t const* const buffer,
+					std::shared_ptr<Holder> const& buffer,
+					typename buffer_type::const_pointer const data,
 					std::size_t const number,
 					long_symbol_table const& name_table
 					)
@@ -74,13 +126,13 @@ namespace ytl
 
 					//
 					if ( header->size_of_raw_data != 0 ) {
-						auto const buffer_begin = buffer + header->pointer_to_raw_data;
+						auto const buffer_begin = data + header->pointer_to_raw_data;
 
-						raw_ = ytl::assembler::binary( buffer_begin, buffer_begin + header->size_of_raw_data );
+						binary_ = copy_traits::copy( buffer, buffer_begin, buffer_begin + header->size_of_raw_data );
 					}
 
 					// 
-					auto const relocations_begin = reinterpret_cast<image::relocation const*>( buffer + header->pointer_to_relocations );
+					auto const relocations_begin = reinterpret_cast<image::relocation const*>( data + header->pointer_to_relocations );
 					auto const relocations_num = ( flags & image::scn_lnk_nreloc_ovfl )
 													? relocations_begin->reloc_count - 1/*(?)*/	// IMAGE_SCN_LNK_NRELOC_OVFL ‚ª —§‚Á‚Ä‚¢‚éê‡‚ÍAÄ”z’uî•ñ‚Ìæ“ª‚ªŒÂ”‚Ìî•ñŽ‚Â
 													: header->number_of_relocations;
@@ -102,9 +154,9 @@ namespace ytl
 					return name_;
 				}
 
-				ytl::assembler::binary const& get_raw_binary() const
+				buffer_type const& get_binary() const
 				{
-					return raw_;
+					return binary_;
 				}
 
 				dword_t get_characteristics() const
@@ -122,10 +174,67 @@ namespace ytl
 				image::section_header self_;
 				std::size_t number_;
 				std::string name_;
-				ytl::assembler::binary raw_;
+				buffer_type binary_;
 
 				relocation_table_type relocations_;
 			};
+
+
+			// 
+			template<typename Buffer>
+			class sections
+			{
+			public:
+				typedef Buffer											buffer_type;
+
+				typedef section<buffer_type>							section_type;
+				typedef std::vector<section_type>						section_table_type;
+
+				typedef typename section_table_type::const_iterator		const_iterator;
+				typedef typename section_table_type::size_type			size_type;
+
+			public:
+				template<typename Holder>
+				sections(
+					image::file_header const* const header,
+					image::section_header const* const begin_section_headers_pointer,
+					std::shared_ptr<Holder const> const& holder,
+					long_symbol_table const& name_table
+					)
+				{
+					std::cout << "Sections_num : " << header->number_of_sections << std::endl;
+
+					for( std::size_t i=0; i<header->number_of_sections; ++i ) {
+						sections_.emplace_back( begin_section_headers_pointer + i, holder, holder->data(), i, name_table );
+					}
+				}
+
+
+
+				section_type const& at( size_type const index ) const
+				{
+					return sections_.at( index - 1 );		// 1 - based
+				}
+
+				const_iterator begin() const
+				{
+					return sections_.begin();
+				}
+
+				const_iterator end() const
+				{
+					return sections_.end();
+				}
+
+				size_type size() const
+				{
+					return sections_.size();
+				}
+
+			private:
+				section_table_type sections_;
+			};
+
 
 
 			// symbol information
@@ -201,62 +310,14 @@ namespace ytl
 
 
 
-			class sections
-			{
-				typedef std::vector<section>					section_table_type;
-				//typedef section_table_type::iterator			iterator;
-
-			public:
-				typedef section_table_type::const_iterator		const_iterator;
-				typedef section_table_type::size_type			size_type;
-
-			public:
-				sections(
-					image::file_header const* const header,
-					image::section_header const* const begin_section_headers_pointer,
-					byte_t const* const buffer,
-					long_symbol_table const& name_table
-					)
-				{
-//					std::cout << "Sections_num : " << header->number_of_sections << std::endl;
-
-					for( std::size_t i=0; i<header->number_of_sections; ++i ) {
-						sections_.emplace_back( begin_section_headers_pointer + i, buffer, i, name_table );
-					}
-				}
-
-
-
-				section const& at( section_table_type::size_type const index ) const
-				{
-					return sections_.at( index - 1 );		// 1 - based
-				}
-
-				const_iterator begin() const
-				{
-					return sections_.begin();
-				}
-
-				const_iterator end() const
-				{
-					return sections_.end();
-				}
-
-				size_type size() const
-				{
-					return sections_.size();
-				}
-
-			private:
-				std::vector<section> sections_;
-			};
 
 
 			class symbols
 			{
-				typedef std::vector<symbol>			symbol_table_type;
-
 			public:
+				typedef symbol									symbol_type;
+				typedef std::vector<symbol_type>				symbol_table_type;
+
 				typedef symbol_table_type::const_iterator		const_iterator;
 				typedef symbol_table_type::size_type			size_type;
 
@@ -267,8 +328,8 @@ namespace ytl
 					long_symbol_table const& name_table
 					)
 				{
-					std::cout << "Symbols_num : " << header->number_of_symbols << std::endl
-						<< (void*)header << " : " << (void*)begin_symbol_pointer << std::endl;
+//					std::cout << "Symbols_num : " << header->number_of_symbols << std::endl
+//						<< (void const*)&header << " : " << (void*)begin_symbol_pointer << std::endl;
 
 					for( std::size_t i=0; i<header->number_of_symbols; ++i ) {
 						auto const p = begin_symbol_pointer + i;
@@ -279,8 +340,7 @@ namespace ytl
 				}
 
 
-
-				symbol const& at( symbol_table_type::size_type const index ) const
+				symbol const& at( size_type const index ) const
 				{
 					std::cout << "?!! require symbol index : " << index << " / " << symbols_.size() << std::endl;
 					return symbols_.at( index );
@@ -296,7 +356,7 @@ namespace ytl
 					return symbols_.end();
 				}
 
-				symbol_table_type::size_type size() const
+				size_type size() const
 				{
 					return symbols_.size();
 				}
@@ -308,7 +368,7 @@ namespace ytl
 					return find( name ) != symbols_.cend();
 				}
 
-				boost::optional<symbol const&> get( std::string const& name ) const
+				boost::optional<symbol_type const&> get( std::string const& name ) const
 				{
 					auto const it = find( name );
 					if ( it == symbols_.cend() ) {
@@ -318,12 +378,12 @@ namespace ytl
 					return *it;
 				}
 
-				symbol_table_type::const_iterator find( std::string const& name ) const
+				const_iterator find( std::string const& name ) const
 				{
 					return std::find_if(
 								symbols_.cbegin(),
 								symbols_.cend(),
-								[&]( symbol const& sec ) { return sec.get_name() == name; }
+								[&]( symbol_type const& sec ) { return sec.get_name() == name; }
 								);
 				}
 
@@ -333,61 +393,54 @@ namespace ytl
 
 
 
-			template<template Buffer>
 			class immutable_accessor
 			{
-				typedef Buffer													raw_buffer_type;
-
-				YTL_REQUIRE_BINARY_BUFFER( raw_buffer_type )
+				friend op::validator;
 
 			private:
-				struct validator
-				{
-					template<typename T>
-					void operator()( T const& p ) const
-					{
-						if ( p_->size() < sizeof( image::file_header ) ) {
-							throw std::runtime_error( "Invalid coff format." );
-						}
-					}
-				};
+				typedef detail::immutable_valid_buffer_holder<op::validator>	holder_type;
+				typedef holder_type const										const_holder_type;
+				typedef std::shared_ptr<const_holder_type>						holder_shared_pointer;
 
-			private:
-				typedef immutable_buffer_holder<raw_buffer_type, validator>			holder_type;
-				typedef const_shared_buffer_range<holder_type::const_buffer_type>	const_buffer_type;
+				typedef const_shared_binary_range<const_holder_type>			buffer_type;
 
 			public:
-				typedef section										section_type;
-				typedef	section_type const&							const_section_reference;
-				typedef boost::optional<const_section_reference>	optional_const_section_reference;
+				typedef sections<buffer_type>									section_table_type;
+				typedef section_table_type::section_type				section_type;
+				typedef	section_type const&										const_section_reference;
+				typedef boost::optional<const_section_reference>				optional_const_section_reference;
 
-				typedef symbol										symbol_type;
-				typedef	symbol_type const&							const_symbol_reference;
-				typedef boost::optional<const_symbol_reference>		optional_const_symbol_reference;
-
-			private:
+				typedef symbols													symbol_table_type;
+				typedef symbol_table_type::symbol_type							symbol_type;
+				typedef	symbol_type const&										const_symbol_reference;
+				typedef boost::optional<const_symbol_reference>					optional_const_symbol_reference;
 
 			public:
-				// move
-				immutable_accessor( raw_buffer_type&& buffer )
-					: holder_( std::move( buffer ) )
-					, first_( get_archive_header_pointer_by_index( 0 ) )
-					, second_( get_archive_header_pointer_by_index( 1 ) )
-					, longnames_( get_archive_header_pointer_by_index( 2 ) )	// may be existed
-				{}
-
-				basic_accessor( binary_pointer_type const& p )
-					: raw_( p )
-					, header_( reinterpret_cast<image::file_header const*>( raw_->data() ) )
-					, long_names_( long_symbol_table_begin_pointer() )
-					, sections_( header_, section_header_begin_pointer(), raw_->data(), long_names_ )
-					, symbols_( header_, symbol_begin_pointer(), long_names_ )
+				// move / copy / unique_ptr
+				template<typename Buffer>
+				immutable_accessor( Buffer&& buffer )
+					: holder_ptr_( std::make_shared<holder_type>( std::forward<Buffer>( buffer ) ) )
+					, header_( reinterpret_cast<image::file_header const*>( holder_ptr_->data() ) )
+					, long_names_(
+							op::long_symbol_table_begin_pointer( header_, holder_ptr_->data() )
+							)
+					, sections_(
+							header_,
+							op::section_header_begin_pointer( header_ ),
+							holder_ptr_,
+							long_names_
+							)
+					, symbols_(
+							header_,
+							op::symbol_begin_pointer( header_, holder_ptr_->data() ),
+							long_names_
+							)
 				{}
 
 			public:
 				bool is_exist( std::string const& name ) const
 				{
-					return (bool)get_section( get_section );
+					return static_cast<bool>( get_section( name ) );
 				}
 				
 				optional_const_section_reference get_section( std::string const& name ) const
@@ -399,7 +452,7 @@ namespace ytl
 					return boost::none;
 				}
 
-				const_section_reference get_section( symbol const& symbol ) const
+				const_section_reference get_section( symbol_type const& symbol ) const
 				{
 					return sections_.at( symbol.get_section_number() );
 				}
@@ -409,53 +462,32 @@ namespace ytl
 					return symbols_.get( name );
 				}
 
-				sections const& get_sections() const
+				section_table_type const& get_sections() const
 				{
 					return sections_;
 				}
 
-				symbols const& get_symbols() const
+				symbol_table_type const& get_symbols() const
 				{
 					return symbols_;
 				}
 
 			private:
-				inline image::section_header const* section_header_begin_pointer() const
-				{
-					return reinterpret_cast<image::section_header const*>( header_ + 1 );
-				}
-
-				inline image::symbol const* symbol_begin_pointer() const
-				{
-					return reinterpret_cast<image::symbol const*>( raw_->data() + header_->pointer_to_symbol_table );
-				}
-
-				inline byte_t const* long_symbol_table_begin_pointer() const
-				{
-					return reinterpret_cast<byte_t const*>( symbol_begin_pointer() + header_->number_of_symbols );
-				}
-
-			private:
-				binary_wrapper raw_;
+				holder_shared_pointer holder_ptr_;
 				image::file_header const* header_;
 
 				long_symbol_table long_names_;
-				sections sections_;
-				symbols symbols_;
+				section_table_type sections_;
+				symbol_table_type symbols_;
 			};
 
 
-//			typedef basic_accessor<binary_buffer<std::allocator>> accessor;
-
-
-			template<typename F, template <typename> class Allocator>
-			basic_accessor<Allocator> build_object( F const& f, basic_accessor<Allocator>* )
+			template<typename OutputBuffer>
+			class basic_accessor
 			{
-				auto p = std::make_shared<ytl::assembler::basic_binary<Allocator>>();
-				f( *p );
+				/* Not implemented */
+			};
 
-				return basic_accessor<Allocator>( p );
-			}
 
 		} // namespace coff
 	} // namespace fileformat

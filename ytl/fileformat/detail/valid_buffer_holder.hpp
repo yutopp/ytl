@@ -5,6 +5,7 @@
 #include <type_traits>
 
 #include <ytl/buffer/detail/binary_buffer_base.hpp>
+#include <ytl/utility/guard_macros.hpp>
 
 namespace ytl
 {
@@ -20,7 +21,7 @@ namespace ytl
 
 
 			template<typename Validator = unused_dummy_validator>
-			class immutable_buffer_holder
+			class immutable_valid_buffer_holder
 			{
 			public:
 				typedef ytl::detail::binary_buffer_policy::value_type			value_type;
@@ -41,50 +42,43 @@ namespace ytl
 				};
 
 				//
-				template<typename Buffer, typename Validator>
+				template<typename Buffer, typename ValidatorType>
 				class holder
 					: public holder_base
 				{
+					YTL_REQUIRE_BINARY_BUFFER( Buffer )
+
 					typedef typename std::remove_reference<Buffer>::type	buffer_type;
-					typedef typename std::add_const<buffer_type>::type		const_buffer_type;
-					typedef std::shared_ptr<const_buffer_type>				const_buffer_shared_pointer;
 
 				public:
 					holder( buffer_type&& buffer )
-						: pointer_( std::make_shared<const_buffer_type>( std::move( buffer ) ) )
+						: buffer_( std::move( buffer ) )
 					{
-						Validator()( pointer_ );
+						ValidatorType()( buffer_ );
 					}
-
-					holder( std::unique_ptr<const_buffer_type> buffer )
-						: pointer_( std::move( buffer ) )
-					{
-						Validator()( pointer_ );
-					}
-
 
 					const_pointer data() const
 					{
-						return pointer_->data();
+						return buffer_.data();
 					}
 
 					const_pointer begin() const
 					{
-						return pointer_->begin();
+						return buffer_.begin();
 					}
 
 					const_pointer end() const
 					{
-						return pointer_->end();
+						return buffer_.end();
 					}
 
 					size_type size() const
 					{
-						return pointer_->size();
+						return buffer_.size();
 					}
 
 				public:
-					const_buffer_shared_pointer pointer_;
+					buffer_type buffer_;
 				};
 
 			private:
@@ -93,29 +87,34 @@ namespace ytl
 			public:
 				// for rvalue
 				template<typename Buffer>
-				immutable_buffer_holder(
+				immutable_valid_buffer_holder(
 					Buffer&& buffer,
-					typename std::enable_if<std::is_rvalue_reference<Buffer&&>::value>::type* =0		// only rvalue
+					typename std::enable_if<std::is_rvalue_reference<Buffer&&>::value>::type* =0
 					)
 					: holder_( std::make_shared<holder<Buffer, Validator>>( std::move( buffer ) ) )
 				{}
 
 				// for lvalue(do copy)
 				template<typename Buffer>
-				immutable_buffer_holder(
+				immutable_valid_buffer_holder(
 					Buffer&& buffer,
-					typename std::enable_if<!std::is_rvalue_reference<Buffer&&>::value>::type* =0		// only rvalue
+					typename std::enable_if<!std::is_rvalue_reference<Buffer&&>::value>::type* =0
 					)
-					: holder_( std::make_shared<holder<std::remove_reference<Buffer>::type, Validator>>( buffer ) )
+					: holder_( std::make_shared<
+										holder<
+											typename std::remove_const<typename std::remove_reference<Buffer>::type>::type,
+											Validator
+											>
+										>( typename std::remove_const<typename std::remove_reference<Buffer>::type>::type( buffer ) ) )
 				{}
 
 				// unique_ptr
 				template<typename Buffer>
-				immutable_buffer_holder(
+				immutable_valid_buffer_holder(
 					std::unique_ptr<Buffer> buffer/*,
 					typename std::enable_if<!std::is_reference<Buffer>::value>::type* =0		// only value contain pointer */
 					)
-					: holder_( std::make_shared<holder<Buffer, Validator>>( std::move( buffer ) ) )
+					: holder_( std::make_shared<holder<Buffer, Validator>>( std::move( *buffer ) ) )
 				{}
 
 
