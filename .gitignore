@@ -1,9 +1,12 @@
 /*/*/ipch/
 /*/*/Debug/
+/*/*/Release/
 /*/*/TestResults/
 /*/*/*/ipch/
 /*/*/*/Debug/
+/*/*/*/Release/
 /*/*/*/TestResults/
 *.opensdf
 *.suo
 *.sdf
+*.exe

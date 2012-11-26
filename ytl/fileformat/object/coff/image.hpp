@@ -17,7 +17,7 @@ namespace ytl
 				{
 				};
 				word_t const file_machine_unknown			= 0;
-				word_t const file_machine_I386				= 0x014c;	// Intel 386.
+				word_t const file_machine_i386				= 0x014c;	// Intel 386.
 				word_t const file_machine_R3000				= 0x0162;	// MIPS little-endian, 0x160 big-endian
 				word_t const file_machine_R4000				= 0x0166;	// MIPS little-endian
 				word_t const file_machine_R10000			= 0x0168;	// MIPS little-endian
@@ -63,6 +63,7 @@ namespace ytl
 				word_t const file_up_system_only			= 0x4000;	// File should only be run on a UP machine
 				word_t const file_bytes_reversed_hi			= 0x8000;	// Bytes of machine word are reversed.
 
+                // 
 				struct file_header
 				{
 					word_t machine;
@@ -190,13 +191,43 @@ namespace ytl
 
 
 
+
 				enum symbol_section_number : short_t
 				{
 					sym_undefined		= (short_t)0,			// Symbol is undefined or is common.
 					sym_absolute		= (short_t)-1,			// Symbol is an absolute value.
 					sym_debug			= (short_t)-2,			// Symbol is a special debug item.
-					sym_sectoin_max		= (short_t)0xfeff				// Values 0xFF00-0xFFFF are special
+					sym_sectoin_max		= (short_t)0xfeff		// Values 0xFF00-0xFFFF are special
 				};
+
+
+                //
+                // Storage classes.
+                //
+                enum symbol_strage_class : short_t
+                {
+                    sym_class_END_OF_FUNCTION     = (BYTE)-1,
+                    sym_class_NULL                = 0x0000,
+                    sym_class_AUTOMATIC           = 0x0001,
+                    sym_class_external            = 0x0002,
+                    sym_class_static              = 0x0003,
+                    sym_class_REGISTER            = 0x0004,
+                    sym_class_EXTERNAL_DEF        = 0x0005,
+                    sym_class_label               = 0x0006,
+                    sym_class_UNDEFINED_LABEL     = 0x0007,
+                    sym_class_MEMBER_OF_STRUCT    = 0x0008,
+                    sym_class_ARGUMENT            = 0x0009,
+                    sym_class_STRUCT_TAG          = 0x000A,
+                    sym_class_MEMBER_OF_UNION     = 0x000B,
+                    sym_class_UNION_TAG           = 0x000C,
+                    sym_class_TYPE_DEFINITION     = 0x000D,
+                    sym_class_UNDEFINED_STATIC    = 0x000E,
+                    sym_class_ENUM_TAG            = 0x000F,
+                    sym_class_MEMBER_OF_ENUM      = 0x0010,
+                    sym_class_REGISTER_PARAM      = 0x0011,
+                    sym_class_BIT_FIELD           = 0x0012
+                };
+
 
 #include <ytl/detail/packed_2_begin.hpp>
 				struct symbol

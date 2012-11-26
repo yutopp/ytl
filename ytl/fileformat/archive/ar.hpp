@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 
 #include <ytl/buffer/shared_binary_range.hpp>
+#include <ytl/utility/guard_macros.hpp>
 
 #include "../config.hpp"
 #include "../detail/valid_buffer_holder.hpp"
@@ -73,7 +74,7 @@ namespace ytl
 					char const* end = begin + N;
 
 					if ( str[0] != '/' || ( str[0] == '/' && str[1] == '/' ) ) {
-						auto const& s = detail::shrink_space( begin, end );
+						auto const& s = detail::trim( begin, end );
 						return std::string( s.begin(), s.end() - ( s.back() == '/' ? 1 : 0 ) );
 
 					} else {
@@ -150,16 +151,17 @@ namespace ytl
 			//
 			class second_linker_member
 			{
-				typedef uint32_t					num_type;
+				typedef uint32_t										num_type;
 
 			public:
-				typedef uint32_t					offset_type;
-				typedef uint16_t					index_type;
-				typedef std::string					string_type;
+				typedef uint32_t										offset_type;
+				typedef uint16_t										index_type;
+				typedef std::string										string_type;
+				typedef std::size_t										size_type;
 
-				typedef std::vector<offset_type>	offsets_type;
-				typedef std::vector<index_type>		indices_type;
-				typedef std::vector<string_type>	symbols_type;
+				typedef std::vector<offset_type>						offsets_type;
+				typedef std::vector<index_type>							indices_type;
+				typedef std::unordered_map<string_type, size_type>		symbols_type;
 
 			public:
 				explicit second_linker_member( image::member_header const* const raw_header )
@@ -173,12 +175,13 @@ namespace ytl
 
 					//
 					num_type const member_num = *reinterpret_cast<num_type const*>( buffer_ );
+					offsets_.reserve( member_num );
 					std::cout << "member : " << member_num << std::endl;
 					{
 						auto pointer_offset = reinterpret_cast<offset_type const*>( buffer_ + sizeof( num_type ) );
 						for( num_type i=0; i<member_num; ++i ) {
 							offset_type const offset = *( pointer_offset + i );
-							offsets_.push_back( offset );
+							offsets_.emplace_back( offset );
 
 //							std::cout << "offset : " << offset << std::endl;
 						}
@@ -187,43 +190,48 @@ namespace ytl
 
 					//
 					num_type const symbol_num = *reinterpret_cast<offset_type const*>( buffer_ + offsets_offset );
+					indices_.reserve( symbol_num );
 					std::cout << "symbol_num : " << symbol_num << std::endl;
 					{
 						auto pointer_offset = reinterpret_cast<index_type const*>( buffer_ + offsets_offset + sizeof( num_type ) );
 						for( num_type i=0; i<symbol_num; ++i ) {
 							index_type const index = *( pointer_offset + i );
-							indices_.push_back( index - 1 );	// index is 1-based...
+							indices_.emplace_back( index - 1 );	// index is 1-based...
 
 //							std::cout << "symbol_index : " << index << std::endl;
 						}
 					}
 					std::size_t symbols_offset = offsets_offset + sizeof( num_type ) + symbol_num * sizeof( index_type );
 
-					//
+					symbols_.reserve( symbol_num );
 					{
 						char const* it = reinterpret_cast<char const*>( buffer_ + symbols_offset );
 						for( num_type i=0; i<symbol_num; ++i ) {
 							std::string name( it );
 							it += name.size() + 1;
 
-							symbols_.emplace_back( std::move( name ) );
+//							std::cout << "name : " << name << std::endl;
 
-							//std::cout << "name : " << name << std::endl;
+							symbols_.emplace( std::move( name ), i );
 						}
 					}
 				}
 
+				bool is_symbol_exist( string_type const& symbol ) const
+				{
+					return static_cast<bool>( get_offset_by_symbol( symbol ) );
+				}
 
 				boost::optional<offset_type> get_offset_by_symbol( string_type const& symbol ) const
 				{
-					auto const it = std::lower_bound( symbols_.cbegin(), symbols_.cend(), symbol );
+					auto const& it = symbols_.find( symbol );
 					if ( it == symbols_.cend() ) {
 						return boost::none;
 					}
-					auto const index = std::distance( symbols_.cbegin(), it );
 
-					return get_offset_by_index( indices_.at( index ) );
+					return get_offset_by_index( indices_.at( it->second ) );
 				}
+
 
 				boost::optional<offset_type> get_offset_by_index( index_type const index ) const
 				{
@@ -323,6 +331,7 @@ namespace ytl
 			class immutable_accessor
 			{
 			private:
+            public:
 				typedef detail::immutable_valid_buffer_holder<op::validator>	holder_type;
 				typedef holder_type const										const_holder_type;
 				typedef std::shared_ptr<const_holder_type>						holder_shared_pointer;
@@ -331,14 +340,14 @@ namespace ytl
 				typedef ytl::detail::container_copy_traits<buffer_type>			copy_traits;
 
 			public:
-				typedef	archive<buffer_type>									archive_type;
+				typedef archive<buffer_type>									archive_type;
 				typedef std::shared_ptr<archive_type>							archive_pointer_type;
 				typedef std::size_t												offset_type, index_type;
 
 			public:
-				// move / copy / unique_ptr
+				// generate from buffer - move / copy / unique_ptr
 				template<typename Buffer>
-				immutable_accessor( Buffer&& buffer )
+				explicit immutable_accessor( Buffer&& buffer, YTL_ENABLE_IF_ONLY_BUFFER_TYPE( Buffer ) )
 					: holder_ptr_( std::make_shared<holder_type>( std::forward<Buffer>( buffer ) ) )
 					, first_( get_archive_header_pointer_by_index( 0 ) )
 					, second_( get_archive_header_pointer_by_index( 1 ) )

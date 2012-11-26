@@ -11,15 +11,15 @@ namespace ytl
 {
 	// type specified
 	template<typename CharT>
-	inline binary_buffer<> read( CharT const* const filename )
+	inline binary_buffer read( CharT const* const filename )
 	{
 		return read<binary_buffer<>>( filename );
 	}
 
 	template<typename CharT>
-	inline binary_buffer<> read( std::basic_string<CharT> const& filename )
+	inline binary_buffer read( std::basic_string<CharT> const& filename )
 	{
-		return read<binary_buffer<>>( filename.c_str() );
+		return read<binary_buffer>( filename.c_str() );
 	}
 
 
@@ -40,15 +40,15 @@ namespace ytl
 	}
 
 	template<typename CharT>
-	inline std::shared_ptr<binary_buffer<>> read_shared( CharT const* const filename )
+	inline std::shared_ptr<binary_buffer> read_shared( CharT const* const filename )
 	{
-		return read_shared<binary_buffer<>>( filename );
+		return read_shared<binary_buffer>( filename );
 	}
 
 	template<typename CharT>
-	inline std::shared_ptr<binary_buffer<>> read_shared( std::basic_string<CharT> const& filename )
+	inline std::shared_ptr<binary_buffer> read_shared( std::basic_string<CharT> const& filename )
 	{
-		return read_shared<binary_buffer<>>( filename.c_str() );
+		return read_shared<binary_buffer>( filename.c_str() );
 	}
 
 
@@ -70,15 +70,15 @@ namespace ytl
 	}
 
 	template<typename CharT>
-	inline std::unique_ptr<binary_buffer<>> read_unique( CharT const* const filename )
+	inline std::unique_ptr<binary_buffer> read_unique( CharT const* const filename )
 	{
-		return read_unique<binary_buffer<>>( filename );
+		return read_unique<binary_buffer>( filename );
 	}
 
 	template<typename CharT>
-	inline std::unique_ptr<binary_buffer<>> read_unique( std::basic_string<CharT> const& filename )
+	inline std::unique_ptr<binary_buffer> read_unique( std::basic_string<CharT> const& filename )
 	{
-		return read_unique<binary_buffer<>>( filename.c_str() );
+		return read_unique<binary_buffer>( filename.c_str() );
 	}
 
 } // namespace ytl

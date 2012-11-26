@@ -20,7 +20,7 @@ namespace ytl
 			};
 
 
-			template<typename Validator = unused_dummy_validator>
+			template<typename Validator>
 			class immutable_valid_buffer_holder
 			{
 			public:
@@ -31,6 +31,7 @@ namespace ytl
 			private:
 				// 
 				class holder_base
+                    : private boost::noncopyable
 				{
 				public:
 					virtual ~holder_base() {}
@@ -101,11 +102,12 @@ namespace ytl
 					typename std::enable_if<!std::is_rvalue_reference<Buffer&&>::value>::type* =0
 					)
 					: holder_( std::make_shared<
-										holder<
-											typename std::remove_const<typename std::remove_reference<Buffer>::type>::type,
-											Validator
-											>
-										>( typename std::remove_const<typename std::remove_reference<Buffer>::type>::type( buffer ) ) )
+									holder<
+										typename std::remove_const<typename std::remove_reference<Buffer>::type>::type,
+										Validator
+										>
+									>( typename std::remove_const<typename std::remove_reference<Buffer>::type>::type( buffer ) )
+                                )
 				{}
 
 				// unique_ptr
@@ -143,8 +145,7 @@ namespace ytl
 			};
 
 
-
-			template<typename Buffer, typename Validator = unused_dummy_validator>
+/*			template<typename Buffer, typename Validator = unused_dummy_validator>
 			class buffer_holder
 			{
 			public:
@@ -172,7 +173,7 @@ namespace ytl
 
 			private:
 				buffer_shared_pointer pointer_;
-			};
+			};*/
 
 		} // namespace detail
 	} // namespace fileformat

@@ -17,5 +17,19 @@
 
 #endif
 
+namespace ytl
+{
+    inline std::size_t padding_size( std::size_t const size, std::size_t alignment )
+    {
+        return ( size % alignment != 0 )
+                ? ( alignment - size % alignment )
+                : 0;
+    }
+
+    inline std::size_t aligned_size( std::size_t const size, std::size_t alignment )
+    {
+        return size + padding_size( size, alignment );
+    }
+}
 
 #endif /*YTL_UTILITY_ALIGNMENT_HPP*/

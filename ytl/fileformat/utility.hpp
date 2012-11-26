@@ -14,13 +14,40 @@ namespace ytl
 {
 	namespace fileformat
 	{
+        template<typename Object, typename Buffer>
+        bool is_valid_format( Buffer const& buffer )
+        try {
+            typedef typename Object::validator_type     validator;
+            validator()( buffer );
+
+            return true;
+
+        } catch( std::domain_error const& ) {
+            return false;
+        }
+
+/*
+        template<typename... Types, typename Range>
+        boost::optional<> identify_format( Range const& rng )
+        {
+
+
+
+            return identify_format<Types...>( rng.begin(), rng.end() );
+        }
+*/
+
+
+
+
 		template<typename Object>
 		typename std::remove_reference<Object>::type
 			mapping_object( char const* const filename )
 		{
 			typedef typename std::remove_reference<Object>::type	build_object_type;
+			build_object_type obj( ytl::mapping( filename ) );
 
-			return build_object_type( ytl::mapping( filename ) );
+			return obj;
 		}
 
 		template<typename Object>
@@ -32,11 +59,12 @@ namespace ytl
 
 		template<typename Object, typename Binary>
 		typename std::remove_reference<Object>::type
-			build_object( Binary&& binary )
+			build_object( Binary&& binary/*, YTL_ENABLE_IF_ONLY_BUFFER_TYPE( Binary ) */)
 		{
 			typedef typename std::remove_reference<Object>::type	build_object_type;
+			build_object_type obj( std::forward<Binary>( binary ) );
 
-			return build_object_type( std::forward<Binary>( binary ) );
+			return obj;
 		}
 
 /*		template<template<typename Buffer> class Object, typename Buffer, typename CharT>

@@ -20,10 +20,14 @@ namespace ytl
 			typedef std::shared_ptr<owner_type const>		owner_shared_pointer;
 
 			typedef const_shared_binary_range<Owner>		container_type;
+            typedef typename container_type::const_pointer  binary_const_pointer;
 
 		public:
-			template<typename Iter>
-			static container_type copy( owner_shared_pointer const& owner, Iter const& begin, Iter const& end )
+			static container_type copy( 
+                owner_shared_pointer const& owner,
+                binary_const_pointer const& begin,
+                binary_const_pointer const& end
+                )
 			{
 				return container_type( owner, begin, end );
 			}

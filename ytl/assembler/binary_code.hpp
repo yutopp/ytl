@@ -23,9 +23,10 @@ namespace ytl
 			template<typename Value, template<typename> class Allocator>
 			struct binary_code_container
 			{
-				typedef binary_buffer<Allocator>		type;
+				typedef basic_binary_buffer<Allocator>		type;
 			};
 
+            //
 			template<template <typename> class Allocator>
 			struct get_asm_status_traits<basic_binary_code<Allocator>>
 			{
@@ -37,7 +38,9 @@ namespace ytl
 		} // namespace detail
 
 
-		// binary buffer
+		// binary code
+        // difference between basic_binary_code and binary_buffer_basic
+        //  - basic_binary_code has status for assembler generator(ex, labels)
 		template<template <typename> class Allocator>
 		class basic_binary_code
 			: public detail::resizable_buffer_base<

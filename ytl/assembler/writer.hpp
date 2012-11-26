@@ -108,13 +108,14 @@ namespace ytl
 		{
 		private:
 			template<typename T>
-			static auto check( T const& t ) -> decltype( t.resize(), std::declval<variable_writer<Buffer, EndianWriter>>() );
+			static auto check( T t ) 
+				-> decltype( t.resize( std::declval<typename T::size_type>() ), std::declval<variable_writer<Buffer, EndianWriter>>() );
 
 			template<typename T>
-			static fixed_writer<Buffer, EndianWriter> check();
+			static fixed_writer<Buffer, EndianWriter> check( ... );
 
 		public:
-			typedef decltype( check<Buffer>() )		type;
+			typedef decltype( check<Buffer>( std::declval<Buffer>() ) )		type;
 		};
 
 	} // namespace assembler

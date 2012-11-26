@@ -19,15 +19,15 @@ namespace ytl
 
 
 	// binary buffer
-	template<template <typename> class Allocator = std::allocator>
-	class binary_buffer
+	template<template <typename> class Allocator>
+	class basic_binary_buffer
 		: public detail::resizable_buffer_base<
-					binary_buffer<Allocator>, Allocator,
+					basic_binary_buffer<Allocator>, Allocator,
 					detail::binary_buffer_container
 				>
 	{
 	public:
-		typedef binary_buffer									self_type;
+		typedef basic_binary_buffer								self_type;
 		typedef typename self_type::base_type					base_type;
 
 		typedef typename base_type::wrapped_container_type		wrapped_container_type;
@@ -36,7 +36,7 @@ namespace ytl
 		typedef typename base_type::value_type					value_type;
 
 	public:
-		binary_buffer()
+		basic_binary_buffer()
 		{}
 
 /*		binary_buffer( size_type const size )
@@ -68,19 +68,25 @@ namespace ytl
 			swap( buffer_, rhs.buffer_ );
 		}
 
+		void padding( size_type padding, value_type v = 0 )
+		{
+			for( size_type i=0; i<padding; ++i ) {
+				buffer_.emplace_back( v );
+			}
+		}
 
 		void align( size_type alignment, value_type v = 0 )
 		{
-			size_type const rest = buffer_.size() % alignment;
-
-			for( size_type i=0; i<rest; ++i ) {
-				buffer_.emplace_back( v );
-			}
+            padding( ytl::padding_size( buffer_.size(), alignment ), v );
 		}
 
 	private:
 		wrapped_container_type buffer_;
 	};
+
+
+    //
+    typedef basic_binary_buffer<std::allocator>            binary_buffer;
 }
 
 #endif /*YTL_BINARY_BUFFER_HPP*/

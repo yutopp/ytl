@@ -27,7 +27,6 @@ namespace ytl
 			{
 				using namespace ytl::fileformat::detail;
 
-
 			} // namespace detail
 
 
@@ -35,14 +34,41 @@ namespace ytl
 			{
 				struct validator
 				{
-					template<typename T>
-					void operator()( T const& buffer ) const
-					{
-						if ( buffer.size() < sizeof( image::file_header ) ) {
-							throw std::runtime_error( "Invalid coff format." );
-						}
-					}
-				};
+                    template<typename Buffer>
+                    void operator()( Buffer const& buffer ) const
+                    {
+                        if ( buffer.size() < sizeof( image::file_header ) ) {
+                            throw std::domain_error( "Invalid coff format." );
+                        }
+
+                        image::file_header const* const header
+                            = reinterpret_cast<image::file_header const*>( buffer.data() );
+
+                        if ( !is_valid_machine_type( header->machine ) ) {
+                            throw std::domain_error( "Invalid coff format." );
+                        }
+
+                        if ( buffer.size() < header->pointer_to_symbol_table ) {
+                            throw std::domain_error( "Invalid coff format." );
+                        }
+                    }
+
+                private:
+                    bool is_valid_machine_type( word_t const type ) const
+                    {
+                        switch( type )
+                        {
+                        case image::file_machine_unknown:
+                        case image::file_machine_i386:
+                            break;
+
+                        default:
+                            return false;
+                        }
+
+                        return true;
+                    }
+                };
 
 				inline image::section_header const*
 					section_header_begin_pointer( image::file_header const* const header )
@@ -57,7 +83,7 @@ namespace ytl
 				}
 
 				inline byte_t const*
-					long_symbol_table_begin_pointer( image::file_header const* const header, byte_t const* const data )
+					long_symbol_name_table_begin_pointer( image::file_header const* const header, byte_t const* const data )
 				{
 					return reinterpret_cast<byte_t const*>( symbol_begin_pointer( header, data ) + header->number_of_symbols );
 				}
@@ -65,56 +91,101 @@ namespace ytl
 			} // namespace op
 
 
-
-
-
 			//
-			class long_symbol_table
-			{
-				typedef std::size_t		offset_type;
+            class long_symbol_name_table
+            {
+                typedef std::size_t             size_type, offset_type;
+                typedef std::string             string_type;
 
-			public:
-				long_symbol_table( byte_t const* const buffer )
-					: buffer_( buffer/* + sizeof( dword_t )*/ )
-				{}
+            public:
+                template<typename HolderPtr>
+                long_symbol_name_table(
+                    HolderPtr const& holder,
+                    image::file_header const* const header
+                    )
+                {
+                    byte_t const* const buffer = op::long_symbol_name_table_begin_pointer( header, holder->data() );
+                    size_type const size = *reinterpret_cast<dword_t const*>( buffer );
 
-				std::string get_name_by_offset( offset_type const offset ) const
-				{
-					return std::string( reinterpret_cast<char const*>( buffer_ + offset ) );
-				}
+                    for( size_t i=0, offset=0; i<size; ++i ) {
+                        string_type name( reinterpret_cast<string_type::value_type const*>( buffer ) + offset );
+                        auto const length = name.size();
 
-			private:
-				byte_t const* buffer_;
-			};
+                        names_.emplace( offset, std::move( name ) );
+                        offset += length;
+                    }
+                }
+
+                std::string get_name_by_offset( offset_type const offset ) const
+                {
+                    return names_.at( offset );
+                }
+
+            private:
+                std::map<offset_type, string_type> names_;
+            };
 
 
-			// section information
-			template<typename Buffer>
-			class section
-			{
-			public:
-				typedef Buffer												buffer_type;
+            //
+            template<typename HolderPtr>
+            class lazy_long_symbol_name_table
+            {
+                typedef HolderPtr               holder_shared_pointer;
+                typedef std::size_t             size_type, offset_type;
 
-			private:
-				typedef std::vector<image::relocation>						relocation_table_type;
-				typedef ytl::detail::container_copy_traits<buffer_type>		copy_traits;
+            public:
+                lazy_long_symbol_name_table(
+                    holder_shared_pointer holder,
+                    image::file_header const* const header
+                    )
+                    : holder_( holder )
+                    , buffer_( op::long_symbol_name_table_begin_pointer( header, holder->data() ) )
+                    , size_( *reinterpret_cast<size_type const*>( buffer_ ) )
+                {}
 
-			public:
-				template<typename Holder>
-				section(
-					image::section_header const* const header,
-					std::shared_ptr<Holder> const& buffer,
-					typename buffer_type::const_pointer const data,
-					std::size_t const number,
-					long_symbol_table const& name_table
-					)
-					: self_( *header )
-					, number_( number )
-					, name_( header->name[0] != '/'
-								? detail::shrink_space( header->name )
-								: name_table.get_name_by_offset( detail::binary_cast<std::size_t>( header->name + 1, header->name + sizeof( header->name ) ) )
-						)
-				{
+                std::string get_name_by_offset( offset_type const offset ) const
+                {
+                    return std::string( reinterpret_cast<char const*>( buffer_ + offset ) );
+                }
+
+            private:
+                holder_shared_pointer holder_;
+                byte_t const* buffer_;
+                size_type size_;
+            };
+
+
+
+
+            // section information
+            template<typename Buffer>
+            class section
+            {
+            public:
+                typedef Buffer                                              buffer_type;
+                typedef image::relocation                                   relocation_type;
+                typedef std::vector<relocation_type>                        relocation_table_type;
+
+            private:
+                typedef ytl::detail::container_copy_traits<buffer_type>     copy_traits;
+
+            public:
+                template<typename HolderPtr, typename LongNameTablePtr>
+                section(
+                    HolderPtr const& holder,
+                    image::section_header const* const header,
+                    std::size_t const index,
+                    LongNameTablePtr const& name_table
+                    )
+                    : self_( *header )
+                    , number_( index )
+                    , name_( header->name[0] != '/'
+                                ? detail::trim( header->name )
+                                : name_table->get_name_by_offset(
+                                    detail::binary_cast<std::size_t>( header->name + 1, header->name + sizeof( header->name ) )
+                                    )
+                        )
+                {
 					auto const flags = header->characteristics;
 
 //					std::cout
@@ -126,22 +197,31 @@ namespace ytl
 
 					//
 					if ( header->size_of_raw_data != 0 ) {
-						auto const buffer_begin = data + header->pointer_to_raw_data;
+						auto const buffer_begin = holder->data() + header->pointer_to_raw_data;
 
-						binary_ = copy_traits::copy( buffer, buffer_begin, buffer_begin + header->size_of_raw_data );
+						binary_ = copy_traits::copy(
+                            holder,
+                            buffer_begin,
+                            buffer_begin + header->size_of_raw_data
+                            );
 					}
 
 					// 
-					auto const relocations_begin = reinterpret_cast<image::relocation const*>( data + header->pointer_to_relocations );
+					auto const relocations_begin = reinterpret_cast<image::relocation const*>( holder->data() + header->pointer_to_relocations );
 					auto const relocations_num = ( flags & image::scn_lnk_nreloc_ovfl )
-													? relocations_begin->reloc_count - 1/*(?)*/	// IMAGE_SCN_LNK_NRELOC_OVFL が 立っている場合は、再配置情報の先頭が個数の情報持つ
+													? relocations_begin->reloc_count	// IMAGE_SCN_LNK_NRELOC_OVFL が 立っている場合は、再配置情報の先頭が個数の情報持つ
 													: header->number_of_relocations;
-					for( std::size_t i=( flags & image::scn_lnk_nreloc_ovfl ) ? 1 : 0; i<relocations_num; ++i ) {	
+					auto const relocations_offset = ( flags & image::scn_lnk_nreloc_ovfl )
+													? 1
+													: 0;
+
+					relocations_.reserve( relocations_num - relocations_offset );
+					for( std::size_t i=relocations_offset ? 1 : 0; i<relocations_num; ++i ) {	
 						relocations_.emplace_back( *( relocations_begin + i ) );
 					}
 
-					std::cout << "relocations_num : " << relocations_num << std::endl;
-					std::cout << std::dec <<std::endl;
+//					std::cout << "relocations_num : " << relocations_num << std::endl;
+//					std::cout << std::dec;
 				}
 
 				std::size_t get_number() const
@@ -180,36 +260,111 @@ namespace ytl
 			};
 
 
+
 			// 
-			template<typename Buffer>
-			class sections
+			template<typename Buffer, typename HolderPtr, typename LongNameTablePtr>
+			class lazy_sections
 			{
 			public:
 				typedef Buffer											buffer_type;
+				typedef HolderPtr										holder_shared_pointer;
+				typedef LongNameTablePtr								long_symbol_table_shared_pointer;
 
 				typedef section<buffer_type>							section_type;
 				typedef std::vector<section_type>						section_table_type;
 
-				typedef typename section_table_type::const_iterator		const_iterator;
 				typedef typename section_table_type::size_type			size_type;
 
 			public:
-				template<typename Holder>
-				sections(
+				lazy_sections(
 					image::file_header const* const header,
-					image::section_header const* const begin_section_headers_pointer,
-					std::shared_ptr<Holder const> const& holder,
-					long_symbol_table const& name_table
+					holder_shared_pointer const& holder,
+					long_symbol_table_shared_pointer const& name_table
 					)
+					: holder_( holder )
+					, long_name_table_( name_table )
+					, sections_num_( header->number_of_sections )
+					, section_begin_( op::section_header_begin_pointer( header ) )
+				{
+					std::cout << "Sections_num : " << sections_num_ << std::endl;
+				}
+
+				section_type const& at( size_type const index ) const
+				{
+					return section_type(
+						section_begin_ + ( i - 1 ),		// 1 - based
+						holder,
+						holder->data(),
+						i,
+						name_table
+						);
+				}
+
+				size_type size() const
+				{
+					return sections_num_;
+				}
+
+			private:
+				holder_shared_pointer holder_;
+				long_symbol_table_shared_pointer long_name_table_;
+
+				std::size_t sections_num_;
+				image::section_header const* section_begin_;
+			};
+
+
+
+            // 
+            template<typename Buffer>
+            class sections
+            {
+            public:
+                typedef Buffer                                              buffer_type;
+
+                typedef section<buffer_type>                                section_type;
+                typedef std::vector<section_type>                           section_table_type;
+
+                typedef typename section_table_type::iterator               iterator;
+                typedef typename section_table_type::const_iterator         const_iterator;
+                typedef typename section_table_type::size_type              size_type;
+
+            private:
+                typedef ytl::detail::container_copy_traits<buffer_type>     copy_traits;
+
+			public:
+				template<typename HolderPtr, typename LongNameTablePtr>
+				sections(
+                    HolderPtr const& holder,
+                    image::file_header const* const header,
+                    image::section_header const* const section_headers_begin_pointer,
+                    LongNameTablePtr const& name_table
+					)
+                    : total_binary_(
+                        copy_traits::copy(
+                            holder,
+                            reinterpret_cast<byte_t const*>( section_headers_begin_pointer + header->number_of_sections ),
+                            reinterpret_cast<byte_t const*>( op::symbol_begin_pointer( header, holder->data() ) )
+                            )
+                        )
 				{
 					std::cout << "Sections_num : " << header->number_of_sections << std::endl;
 
 					for( std::size_t i=0; i<header->number_of_sections; ++i ) {
-						sections_.emplace_back( begin_section_headers_pointer + i, holder, holder->data(), i, name_table );
+						sections_.emplace_back( holder, section_headers_begin_pointer + i, i, name_table );
 					}
+
+					assert( sections_.size() == header->number_of_sections );
 				}
 
-
+                buffer_type const& test( std::size_t const offset ) const
+                {
+                    return total_binary_;
+/*                    total_binary_.data()
+                    std::cout
+                        << "index: " << offset / sizeof( image::section ) << std::endl
+                        << "mod  : " << offset % sizeof( image::section ) << std::endl;*/
+                }
 
 				section_type const& at( size_type const index ) const
 				{
@@ -232,6 +387,7 @@ namespace ytl
 				}
 
 			private:
+                buffer_type total_binary_;
 				section_table_type sections_;
 			};
 
@@ -241,7 +397,11 @@ namespace ytl
 			class symbol
 			{
 			public:
-				symbol( image::symbol const* const body, long_symbol_table const& name_table )
+				template<typename LongNameTablePtr>
+				symbol(
+					image::symbol const* const body,
+					LongNameTablePtr const& name_table
+					)
 					: self_( *body )
 				{
 //					std::cout << "section_number: " << body->section_number << std::endl;
@@ -250,8 +410,8 @@ namespace ytl
 
 					// if p->N.Name.Short is zero, use name_table
 					name_ = ( body->N.name.p_short == 0 )
-								? name_table.get_name_by_offset( body->N.name.p_long )
-								: detail::shrink_space( body->N.short_name );
+								? name_table->get_name_by_offset( body->N.name.p_long )
+								: detail::trim( body->N.short_name );
 
 					// 
 					for( std::size_t i=0; i<body->number_of_aux_symbols; ++i ) {
@@ -259,14 +419,14 @@ namespace ytl
 					}
 
 					//
-/*					std::cout
-						<< "is_short: " << ( body->N.name.p_short == 0 ) << "; offset : " << body->N.name.p_long << std::endl
-						<< "symbol_name: " << name_ << std::endl
-						<< "SectionNumber: " << (int)body->section_number << std::endl
-						<< "StorageClass: " << (int)body->storage_class << std::endl
-						<< "Value: " << (int)body->value << std::endl
-						<< "Aux : " << (int)body->number_of_aux_symbols << std::endl
-						<< std::endl;*/
+//					std::cout
+//						<< "is_short: " << ( body->N.name.p_short == 0 ) << "; offset : " << body->N.name.p_long << std::endl
+//						<< "symbol_name: \"" << name_ << "\"" << std::endl
+//						<< "SectionNumber: " << (int)body->section_number << std::endl
+//						<< "StorageClass: " << (int)body->storage_class << std::endl
+//						<< "Value: " << (int)body->value << std::endl
+//						<< "Aux : " << (int)body->number_of_aux_symbols << std::endl
+//						<< std::endl;/**/
 				}
 
 
@@ -318,31 +478,32 @@ namespace ytl
 				typedef symbol									symbol_type;
 				typedef std::vector<symbol_type>				symbol_table_type;
 
+				typedef symbol_table_type::iterator				iterator;
 				typedef symbol_table_type::const_iterator		const_iterator;
 				typedef symbol_table_type::size_type			size_type;
 
 			public:
+				template<typename HolderPtr, typename LongNameTablePtr>
 				symbols(
 					image::file_header const* const header,
-					image::symbol const* const begin_symbol_pointer,
-					long_symbol_table const& name_table
+					HolderPtr const& holder,
+					LongNameTablePtr const& name_table
 					)
 				{
+					image::symbol const* const begin_symbol_pointer
+						= op::symbol_begin_pointer( header, holder->data() );
 //					std::cout << "Symbols_num : " << header->number_of_symbols << std::endl
 //						<< (void const*)&header << " : " << (void*)begin_symbol_pointer << std::endl;
 
 					for( std::size_t i=0; i<header->number_of_symbols; ++i ) {
-						auto const p = begin_symbol_pointer + i;
-						symbols_.emplace_back( p, name_table );
-
-//						i += p->number_of_aux_symbols;
+						symbols_.emplace_back( begin_symbol_pointer + i, name_table );
 					}
 				}
 
-
+			public:
 				symbol const& at( size_type const index ) const
 				{
-					std::cout << "?!! require symbol index : " << index << " / " << symbols_.size() << std::endl;
+//					std::cout << "?!! require symbol index : " << index << " / " << symbols_.size() << std::endl;
 					return symbols_.at( index );
 				}
 
@@ -360,8 +521,6 @@ namespace ytl
 				{
 					return symbols_.size();
 				}
-
-
 
 				bool is_exist( std::string const& name ) const
 				{
@@ -393,20 +552,27 @@ namespace ytl
 
 
 
+
+
 			class immutable_accessor
+//               : private boost::noncopyable
 			{
-				friend op::validator;
+            public:
+				typedef op::validator                                           validator_type;
 
 			private:
-				typedef detail::immutable_valid_buffer_holder<op::validator>	holder_type;
+				typedef detail::immutable_valid_buffer_holder<validator_type>	holder_type;
 				typedef holder_type const										const_holder_type;
 				typedef std::shared_ptr<const_holder_type>						holder_shared_pointer;
 
+			public:
 				typedef const_shared_binary_range<const_holder_type>			buffer_type;
 
-			public:
+				typedef lazy_long_symbol_name_table<holder_shared_pointer>		long_symbol_name_table_type;
+				typedef std::shared_ptr<long_symbol_name_table_type const>		long_symbol_name_table_shared_pointer;
+
 				typedef sections<buffer_type>									section_table_type;
-				typedef section_table_type::section_type				section_type;
+				typedef section_table_type::section_type						section_type;
 				typedef	section_type const&										const_section_reference;
 				typedef boost::optional<const_section_reference>				optional_const_section_reference;
 
@@ -416,23 +582,21 @@ namespace ytl
 				typedef boost::optional<const_symbol_reference>					optional_const_symbol_reference;
 
 			public:
-				// move / copy / unique_ptr
+				// generate from buffer - move / copy / unique_ptr
 				template<typename Buffer>
-				immutable_accessor( Buffer&& buffer )
+				explicit immutable_accessor( Buffer&& buffer, YTL_ENABLE_IF_ONLY_BUFFER_TYPE( Buffer ) )
 					: holder_ptr_( std::make_shared<holder_type>( std::forward<Buffer>( buffer ) ) )
 					, header_( reinterpret_cast<image::file_header const*>( holder_ptr_->data() ) )
-					, long_names_(
-							op::long_symbol_table_begin_pointer( header_, holder_ptr_->data() )
-							)
-					, sections_(
-							header_,
-							op::section_header_begin_pointer( header_ ),
-							holder_ptr_,
-							long_names_
-							)
+					, long_names_( std::make_shared<long_symbol_name_table_type>( holder_ptr_, header_ ) )
+                    , sections_(
+                            holder_ptr_,
+                            header_,
+                            op::section_header_begin_pointer( header_ ),
+                            long_names_
+                            )
 					, symbols_(
 							header_,
-							op::symbol_begin_pointer( header_, holder_ptr_->data() ),
+							holder_ptr_,
 							long_names_
 							)
 				{}
@@ -476,7 +640,7 @@ namespace ytl
 				holder_shared_pointer holder_ptr_;
 				image::file_header const* header_;
 
-				long_symbol_table long_names_;
+				long_symbol_name_table_shared_pointer long_names_;
 				section_table_type sections_;
 				symbol_table_type symbols_;
 			};

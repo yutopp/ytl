@@ -10,8 +10,6 @@
 
 #include <ytl/config.hpp>
 
-#include "has_wrapped_container_type.hpp"
-
 namespace ytl
 {
 	namespace detail
@@ -19,8 +17,8 @@ namespace ytl
 		template<std::size_t N, typename Buffer>
 		void dumpbin_impl(
 			Buffer const& bin,
-			std::size_t const offset,
-			std::size_t size, typename std::enable_if<!has_wrapped_container_type<Buffer>::value>::type* =0
+			std::size_t offset,
+			std::size_t size
 			)
 		{
 			static std::size_t const width = 16;
@@ -53,7 +51,7 @@ namespace ytl
 			}
 			std::printf( "\n" );
 
-			auto it = bin.cbegin() + offset;
+			auto it = bin.begin() + offset;
 			std::size_t line = 0;
 			do {
 				// address
@@ -62,7 +60,7 @@ namespace ytl
 				// binary
 				[&, it]() mutable {
 					for( auto i=0; i<width; ++i ) {
-						if ( it < bin.cend() ) {
+						if ( it < bin.end() ) {
 							std::printf( "%02X ", static_cast<unsigned char>( *it ) );
 							++it;
 						} else {
@@ -75,7 +73,7 @@ namespace ytl
 				// ascii
 				[&, it]() mutable {
 					for( auto i=0; i<width; ++i ) {
-						if ( it < bin.cend() ) {
+						if ( it < bin.end() ) {
 							std::printf( "%c", ( *it < 0x20 || *it > 0x7e ) ? '.' : *it );
 							++it;
 						} else {
@@ -86,7 +84,7 @@ namespace ytl
 				std::printf( "\n" );
 
 				for( auto i=0; i<width; ++i ) {
-					if ( it < bin.cend() ) {
+					if ( it < bin.end() ) {
 						++it;
 					}
 				}
@@ -94,15 +92,6 @@ namespace ytl
 			} while( line < ( size + size % width ) / width );
 		}
 
-		template<std::size_t N, typename Buffer>
-		inline void dumpbin_impl(
-			Buffer const& bin,
-			std::size_t const offset,
-			std::size_t size, typename std::enable_if<has_wrapped_container_type<Buffer>::value>::type* =0
-			)
-		{
-			dumpbin_impl<N>( (*bin), offset, size );
-		}
 	} // namespace detail
 
 	template<typename Buffer>

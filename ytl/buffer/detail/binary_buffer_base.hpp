@@ -66,8 +66,8 @@ namespace ytl
 		template<typename Container, typename MemberTraits>
 		struct pointer_type_traits
 		{
-			typedef decltype( MemberTraits::data( *static_cast<Container*>( 0 ) ) )			pointer;
-			typedef decltype( MemberTraits::data( *static_cast<Container const*>( 0 ) ) )	const_pointer;
+			typedef decltype( MemberTraits::data( std::declval<Container>() ) )			pointer;
+			typedef decltype( MemberTraits::data( std::declval<Container const>() ) )	const_pointer;
 		};
 
 
@@ -276,7 +276,7 @@ namespace ytl
 		>
 		inline std::ostream& operator<<(
 			std::ostream& os,
-			fixed_buffer_base<Derived, Allocator, ContainerPolicy> const& buffer
+			typename fixed_buffer_base<Derived, Allocator, ContainerPolicy>::derived_type const& buffer
 			)
 		{
 			os.write( reinterpret_cast<char const*>( &buffer->data()[0] ), buffer->size() );

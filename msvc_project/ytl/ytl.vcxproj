@@ -81,7 +81,7 @@
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\pop_family.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\x86\operation\push_family.hpp" />
     <ClInclude Include="..\..\ytl\assembler\arch\x86\registers.hpp" />
-    <ClInclude Include="..\..\ytl\assembler\binary.hpp" />
+    <ClInclude Include="..\..\ytl\assembler\binary_code.hpp" />
     <ClInclude Include="..\..\ytl\assembler\config.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\buffer_wrapper.hpp" />
     <ClInclude Include="..\..\ytl\assembler\detail\little_endian_writer.hpp" />
@@ -109,12 +109,16 @@
     <ClInclude Include="..\..\ytl\fileformat.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\archive\ar.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\config.hpp" />
-    <ClInclude Include="..\..\ytl\fileformat\detail.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\detail\utils.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\detail\valid_buffer_holder.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\anon\core.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\anon\image.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\object\coff.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\object\coff\core.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\object\coff\image.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\common\image.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\omf.hpp" />
+    <ClInclude Include="..\..\ytl\fileformat\object\omf\core.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\object\pe.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\object\pe\dos_stub.hpp" />
     <ClInclude Include="..\..\ytl\fileformat\utility.hpp" />
@@ -127,8 +131,8 @@
     <ClInclude Include="..\..\ytl\utility\read_binary_file_core.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ytl\fileformat\object\pe\accessor.hpp" />
     <ClCompile Include="..\..\ytl\utility\alignment.hpp" />
-    <ClCompile Include="..\..\ytl\utility\has_wrapped_container_type.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
